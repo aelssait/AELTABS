@@ -413,599 +413,88 @@
 
 
 </div>
+    const SERVER_URL = 'https://onrender.com';
 
+    // Функция загрузки данных с сервера (запускается автоматически)
+    function loadFromServer() {
+        fetch(${SERVER_URL}/get-teams)
+            .then(res => res.json())
+            .then(data => {
+                if (data && Array.isArray(data)) {
+                    tournaments = data;
+                    renderTournaments();
+                }
+            })
+            .catch(err => console.error("Ошибка загрузки:", err));
+    }
 
-
-<script>
-
-    let defaultTeams = [
-
-        { id: 1, name: "Natus Vincere", points: 1000, logo: "https://img-cdn.hltv.org/teamlogo/9v6S8p0p7OQ4zWJcW8u5_O.svg?ixlib=java-2.1.0&s=7c1b500fa2066fa9d0bc650ee0e94bb7", players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"], likes: 15, dislikes: 2, tournamentStatus: "in_game", winnerOf: "AEL Masters 2026" },
-
-        { id: 2, name: "FaZe Clan", points: 850, logo: "", players: ["karrigan", "NiKo", "ropz", "broky", "rain"], likes: 8, dislikes: 4, tournamentStatus: "out", winnerOf: "" },
-
-        { id: 3, name: "Team Spirit", points: 920, logo: "", players: ["shalfey", "chopper", "magixx", "donk", "zoner"], likes: 23, dislikes: 1, tournamentStatus: "none", winnerOf: "" }
-
-    ];
-
-
-
-    let defaultTournaments = [
-
-        { id: 1, name: "AEL Masters 2026", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500", status: "active" }
-
-    ];
-
-
-
-    let teams = JSON.parse(localStorage.getItem('ael_teams')) || defaultTeams;
-
-    let tournaments = JSON.parse(localStorage.getItem('ael_tournaments')) || defaultTournaments;
-
-    
-
-    // Массив для хранения ID команд, за которые пользователь УЖЕ голосовал на этом устройстве
-
-    let votedTeams = JSON.parse(localStorage.getItem('ael_voted_teams')) || [];
-
-
-
-    let isAdmin = false;
-
-    let editingTeamId = null;
-
-
-
-    saveToStorage();
-
-    renderTeams();
-
-    renderTournaments();
-
-
-
+    // Сохранение данных на сервер для всех устройств
     function saveToStorage() {
-
-        localStorage.setItem('ael_teams', JSON.stringify(teams));
-
-        localStorage.setItem('ael_tournaments', JSON.stringify(tournaments));
-
-        localStorage.setItem('ael_voted_teams', JSON.stringify(votedTeams));
-
+        fetch(${SERVER_URL}/save-teams, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(tournaments)
+        })
+        .catch(err => console.error("Ошибка сохранения:", err));
     }
-
-
-
-    function toggleAdminMode() {
-
-        if (!isAdmin) {
-
-            let pass = prompt("Введите пароль администратора:");
-
-            if (pass === "AELVOLLIEANDSH1ROK1Y99") { 
-
-                isAdmin = true;
-
-                document.getElementById('adminPanel').style.display = 'block';
-
-                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-
-                alert("Вы вошли как администратор!");
-
-                renderTeams();
-
-            } else {
-
-                alert("Неверный пароль!");
-
-            }
-
-        } else {
-
-            isAdmin = false;
-
-            document.getElementById('adminPanel').style.display = 'none';
-
-            document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
-
-            renderTeams();
-
-        }
-
-    }
-
-
-
-    function switchTab(tab) {
-
-        document.getElementById('tab-teams').classList.remove('active');
-
-        document.getElementById('tab-tourneys').classList.remove('active');
-
-        document.getElementById('page-teams').classList.add('hidden');
-
-        document.getElementById('page-tourneys').classList.add('hidden');
-
-        document.getElementById('admin-teams-section').classList.add('hidden');
-
-        document.getElementById('admin-tourneys-section').classList.add('hidden');
-
-
-
-        if (tab === 'teams') {
-
-            document.getElementById('tab-teams').classList.add('active');
-
-            document.getElementById('page-teams').classList.remove('hidden');
-
-            document.getElementById('admin-teams-section').classList.remove('hidden');
-
-        } else {
-
-            document.getElementById('tab-tourneys').classList.add('active');
-
-            document.getElementById('page-tourneys').classList.remove('hidden');
-
-            document.getElementById('admin-tourneys-section').classList.remove('hidden');
-
-        }
-
-    }
-
-
-
-    function renderTeams() {
-
-        teams.sort((a, b) => b.points - a.points);
-
-        
-
-        const tbody = document.getElementById('teamsTableBody');
-
-        tbody.innerHTML = '';
-
-
-
-        teams.forEach((team, index) => {
-
-            let logoHtml = team.logo 
-
-                ? `<img class="team-logo" src="${team.logo}" alt="${team.name}">`
-
-                : `<div class="team-logo-placeholder">${team.name.charAt(0)}</div>`;
-
-
-
-            let statusTagHtml = '';
-
-            if (team.tournamentStatus === 'in_game') {
-
-                statusTagHtml = `<span class="status-tag in_game">Участвует</span>`;
-
-            } else if (team.tournamentStatus === 'out') {
-
-                statusTagHtml = `<span class="status-tag out">Вылетел</span>`;
-
-            }
-
-
-
-            let winnerHtml = '';
-
-            if (team.winnerOf && team.winnerOf.trim() !== "") {
-
-                winnerHtml = `<div class="winner-tag">🏆 Победитель ${team.winnerOf}</div>`;
-
-            }
-
-
-
-            // Проверяем, голосовал ли уже пользователь за эту команду
-
-            const hasVoted = votedTeams.includes(team.id);
-
-            const reactedClass = hasVoted ? 'btn-reacted' : '';
-
-
-
-            const tr = document.createElement('tr');
-
-            tr.className = 'team-row';
-
-            tr.innerHTML = `
-
-                <td class="col-place" onclick="togglePlayers(${team.id})">${index + 1}</td>
-
-                <td class="col-team" onclick="togglePlayers(${team.id})">
-
-                    <div class="team-info-cell">
-
-                        ${logoHtml}
-
-                        <div class="team-name-block">
-
-                            <div><span style="font-size: 18px;">${team.name}</span> ${statusTagHtml}</div>
-
-                            ${winnerHtml}
-
-                        </div>
-
-                    </div>
-
-                </td>
-
-                <td class="col-points" onclick="togglePlayers(${team.id})">${team.points}<span>очки</span></td>
-
-                <td class="col-reactions">
-
-                    <div class="reaction-buttons">
-
-                        <button class="btn-like ${reactedClass}" onclick="likeTeam(${team.id}, event, true)">👍 <span>${team.likes || 0}</span></button>
-
-                        <button class="btn-dislike ${reactedClass}" onclick="likeTeam(${team.id}, event, false)">👎 <span>${team.dislikes || 0}</span></button>
-
-                    </div>
-
-                </td>
-
-                <td class="col-actions admin-only ${isAdmin ? '' : 'hidden'}">
-
-                    <div class="status-admin-btns">
-
-                        <button class="btn-status btn-in" onclick="changeTeamTourneyStatus(${team.id}, 'in_game', event)">Участвует</button>
-
-                        <button class="btn-status btn-out" onclick="changeTeamTourneyStatus(${team.id}, 'out', event)">Вылетел</button>
-
-                        <button class="btn-status btn-reset" onclick="changeTeamTourneyStatus(${team.id}, 'none', event)">Сброс</button>
-
-                    </div>
-
-                    <button onclick="editTeam(${team.id}, event)" style="background:none; border:none; color:var(--accent); cursor:pointer; margin-right:15px; font-size:16px;">✏️ Редактировать</button>
-
-                    <button onclick="deleteTeam(${team.id}, event)" style="background:none; border:none; color:var(--inactive-red); cursor:pointer; font-size:16px;">❌ Удалить</button>
-
-                </td>
-
-            `;
-
-            tbody.appendChild(tr);
-
-
-
-            const playersTr = document.createElement('tr');
-
-            playersTr.id = `players-${team.id}`;
-
-            playersTr.className = 'players-row';
-
-            
-
-            let playersHtml = team.players.map(p => `<li>${p}</li>`).join('');
-
-            if(team.players.length === 0) playersHtml = '<span style="color:var(--text-muted); font-size:13px;">Состав не указан</span>';
-
-
-
-            playersTr.innerHTML = `
-
-                <td colspan="${isAdmin ? 5 : 4}">
-
-                    <div class="players-box">
-
-                        <strong style="font-size:12px; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:8px;">Текущий ростер:</strong>
-
-                        <ul class="players-list">${playersHtml}</ul>
-
-                    </div>
-
-                </td>
-
-            `;
-
-            tbody.appendChild(playersTr);
-
-        });
-
-    }
-
-
-
-    function togglePlayers(id) {
-
-        const row = document.getElementById(`players-${id}`);
-
-        row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
-
-    }
-
-
-
-    function changeTeamTourneyStatus(id, status, event) {
-
-        event.stopPropagation();
-
-        const team = teams.find(t => t.id === id);
-
-        team.tournamentStatus = status;
-
-        saveToStorage();
-
-        renderTeams();
-
-    }
-
-
-
-    // Измененная функция: Ограничение на 1 реакцию с устройства
-
-    function likeTeam(id, event, isLike = true) {
-
-        event.stopPropagation();
-
-        
-
-        // Если ID команды уже есть в массиве проголосовавших — блокируем действие
-
-        if (votedTeams.includes(id)) {
-
-            alert("Вы уже оставили своё мнение об этой команде!");
-
-            return;
-
-        }
-
-
-
-        const team = teams.find(t => t.id === id);
-
-        if (isLike) {
-
-            team.likes = (team.likes || 0) + 1;
-
-        } else {
-
-            team.dislikes = (team.dislikes || 0) + 1;
-
-        }
-
-
-
-        // Добавляем ID команды в список проголосовавших на данном ПК/смартфоне
-
-        votedTeams.push(id);
-
-        
-
-        saveToStorage();
-
-        renderTeams();
-
-    }
-
-
-
-    function saveTeam() {
-
-        const name = document.getElementById('teamName').value.trim();
-
-        const points = parseInt(document.getElementById('teamPoints').value) || 0;
-
-        const logo = document.getElementById('teamLogoUrl').value.trim();
-
-        const winnerOf = document.getElementById('teamWinnerOf').value.trim();
-
-        const playersString = document.getElementById('teamPlayers').value;
-
-        const players = playersString ? playersString.split(',').map(p => p.trim()) : [];
-
-
-
-        if (!name) return alert('Введите название команды!');
-
-
-
-        if (editingTeamId) {
-
-            const team = teams.find(t => t.id === editingTeamId);
-
-            team.name = name;
-
-            team.points = points;
-
-            team.logo = logo;
-
-            team.winnerOf = winnerOf;
-
-            team.players = players;
-
-            editingTeamId = null;
-
-        } else {
-
-            teams.push({ id: Date.now(), name, points, logo, winnerOf, players, likes: 0, dislikes: 0, tournamentStatus: 'none' });
-
-        }
-
-
-
-        document.getElementById('teamName').value = '';
-
-        document.getElementById('teamPoints').value = '';
-
-        document.getElementById('teamLogoUrl').value = '';
-
-        document.getElementById('teamWinnerOf').value = '';
-
-        document.getElementById('teamPlayers').value = '';
-
-        
-
-        saveToStorage();
-
-        renderTeams();
-
-    }
-
-
-
-    function editTeam(id, event) {
-
-        event.stopPropagation();
-
-        const team = teams.find(t => t.id === id);
-
-        document.getElementById('teamName').value = team.name;
-
-        document.getElementById('teamPoints').value = team.points;
-
-        document.getElementById('teamLogoUrl').value = team.logo || '';
-
-        document.getElementById('teamWinnerOf').value = team.winnerOf || '';
-
-        document.getElementById('teamPlayers').value = team.players.join(', ');
-
-        editingTeamId = id;
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    }
-
-
-
-    function deleteTeam(id, event) {
-
-        event.stopPropagation();
-
-        if(confirm("Удалить эту команду?")) {
-
-            teams = teams.filter(t => t.id !== id);
-
-            // Удаляем команду из истории голосования, если её удалил админ
-
-            votedTeams = votedTeams.filter(vId => vId !== id);
-
-            saveToStorage();
-
-            renderTeams();
-
-        }
-
-    }
-
-
 
     function renderTournaments() {
-
         const grid = document.getElementById('tournamentsGrid');
-
+        if (!grid) return;
         grid.innerHTML = '';
 
-
-
         tournaments.forEach(t => {
-
             const card = document.createElement('div');
-
-            card.className = 'tournament-card';
-
-            
-
-            const badgeClass = t.status === 'active' ? 'active' : 'inactive';
-
-            const badgeText = t.status === 'active' ? 'Активно' : 'Неактивно';
-
-
-
-            card.innerHTML = `
-
-                <div class="tournament-img" style="background-image: url('${t.img || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500'}')"></div>
-
-                <span class="status-badge ${badgeClass}">${badgeText}</span>
-
+            card.className = tournament-card ${t.status === 'inactive' ? 'tournament-inactive' : ''};
+            card.innerHTML = 
                 <div class="tournament-info">
-
                     <div class="tournament-title">${t.name}</div>
-
-                    <div class="admin-only ${isAdmin ? '' : 'hidden'}" style="margin-top:10px; display:flex; gap:10px;">
-
+                    <div class="admin-only ${typeof isAdmin !== 'undefined' && isAdmin ? '' : 'hidden'}" style="margin-top:10px; display:flex; gap:10px;">
                         <button class="btn" onclick="toggleTourneyStatus(${t.id})" style="padding:4px 8px; font-size:12px;">Сменить статус</button>
-
                         <button class="btn btn-danger" onclick="deleteTourney(${t.id})" style="padding:4px 8px; font-size:12px;">Удалить</button>
-
                     </div>
-
                 </div>
-
-            `;
-
+            ;
             grid.appendChild(card);
-
         });
-
     }
 
-
-
     function saveTournament() {
-
         const name = document.getElementById('tourneyName').value.trim();
-
         const img = document.getElementById('tourneyImg').value.trim();
-
         const status = document.getElementById('tourneyStatus').value;
-
-
 
         if (!name) return alert('Введите название турнира!');
 
-
-
         tournaments.push({ id: Date.now(), name, img, status });
-
         document.getElementById('tourneyName').value = '';
-
         document.getElementById('tourneyImg').value = '';
-
         
-
         saveToStorage();
-
         renderTournaments();
-
     }
-
-
 
     function toggleTourneyStatus(id) {
-
         const tourney = tournaments.find(t => t.id === id);
-
+        if (!tourney) return;
         tourney.status = tourney.status === 'active' ? 'inactive' : 'active';
-
         saveToStorage();
-
         renderTournaments();
-
     }
-
-
 
     function deleteTourney(id) {
-
         if(confirm("Удалить турнир?")) {
-
             tournaments = tournaments.filter(t => t.id !== id);
-
             saveToStorage();
-
             renderTournaments();
-
         }
-
     }
 
-</script>
+    // Первоначальный запуск при открытии сайта
+    loadFromServer();
 
-</body>
+    // Каждые 3 секунды сайт сам проверяет сервер на наличие новых или удаленных команд
+    setInterval(loadFromServer, 3000);
 
-</html>
+
+
