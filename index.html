@@ -3,336 +3,354 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AEL Rating</title>
+    <title>AEL top teams | CS2 Рейтинг</title>
     <style>
+        /* Стилевая палитра в духе HLTV */
         :root {
-            --bg-main: #ffffff;
-            --bg-secondary: #f8fafc;
-            --border-color: #cbd5e1;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent: #2563eb;
-            --accent-light: #eff6ff;
-            --success: #10b981;
-            --danger: #ef4444;
+            --bg-main: #1b1f26;
+            --bg-card: #232932;
+            --bg-header: #16191e;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #e5a93b; /* Фирменный желтый HLTV */
+            --accent-hover: #ffc257;
+            --active-green: #22c55e;
+            --inactive-red: #ef4444;
+            --border: #2e3641;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-main); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* Шапка проекта */
-        header { width: 100%; max-width: 650px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
-        .logo-area h1 { font-size: 28px; font-weight: 800; tracking: -0.5px; color: var(--text-main); }
-        .logo-area span { color: var(--accent); }
-        
-        .nav-tabs { display: flex; gap: 8px; background: var(--bg-secondary); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .tab-btn { background: none; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--text-muted); transition: 0.2s; }
-        .tab-btn.active { background: #ffffff; color: var(--text-main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 50px; }
 
-        .container { width: 100%; max-width: 650px; display: none; }
-        .container.active { display: block; }
-
-        /* Премиум карточки команд */
-        .team-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: all 0.2s ease; }
-        .team-card:hover { border-color: #94a3b8; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        /* Шапка сайта */
+        header { background-color: var(--bg-header); border-bottom: 2px solid var(--accent); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: bold; tracking-letter: 1px; }
+        .logo span { color: var(--accent); }
         
-        .team-layout { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .team-left { display: flex; align-items: center; gap: 15px; }
-        .team-name { font-size: 20px; font-weight: 700; color: var(--text-main); }
-        
-        /* Правый блок: Аватарка сверху, очки в рамке снизу */
-        .team-right-zone { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 80px; }
-        .team-avatar { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-color); background: #f1f5f9; }
-        .points-frame { border: 2px solid var(--text-main); padding: 2px 10px; border-radius: 6px; font-weight: 800; font-size: 14px; text-align: center; width: 100%; background: var(--bg-secondary); }
+        nav button { background: none; border: none; color: var(--text-main); font-size: 16px; margin-left: 20px; cursor: pointer; padding: 5px 10px; transition: 0.2s; }
+        nav button.active, nav button:hover { color: var(--accent); border-bottom: 2px solid var(--accent); }
 
-        /* Выпадающий список игроков */
-        .players-box { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color); display: none; }
-        .players-box.open { display: block; }
-        .player-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-secondary); border-radius: 6px; margin-bottom: 6px; font-size: 15px; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
 
-        /* Карточки турниров */
-        .tourney-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .status-badge.active { background: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
-        .status-badge.inactive { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+        /* Кнопка Админа и Панель */
+        .admin-trigger { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        .admin-trigger:hover { border-color: var(--accent); color: var(--text-main); }
+        .admin-panel { background: var(--bg-card); border: 1px solid var(--accent); padding: 20px; border-radius: 6px; margin-bottom: 20px; display: none; }
+        .admin-panel h3 { margin-bottom: 15px; color: var(--accent); }
+        
+        /* Формы */
+        .form-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        input, select { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 4px; flex: 1; min-width: 150px; }
+        input:focus { border-color: var(--accent); outline: none; }
+        button.btn { background: var(--accent); color: var(--bg-header); border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        button.btn:hover { background: var(--accent-hover); }
 
-        /* Панель администратора */
-        .admin-dashboard { background: #ffffff; border: 2px solid var(--accent); border-radius: 14px; padding: 20px; margin-bottom: 30px; width: 100%; max-width: 650px; display: none; box-shadow: 0 10px 25px rgba(37,99,235,0.05); }
-        .admin-dashboard.visible { display: block; }
-        .admin-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* Таблица Рейтинга */
+        .ranking-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 6px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .ranking-table th { background: var(--bg-header); color: var(--text-muted); text-align: left; padding: 15px; font-size: 14px; text-transform: uppercase; }
+        .ranking-table td { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.1s; }
+        .ranking-table tr:hover td { background: rgba(255,255,255,0.02); }
         
-        .form-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-        .form-row input, .form-row select { flex: 1; min-width: 150px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; outline: none; }
-        .form-row input:focus { border-color: var(--accent); }
-        
-        .btn-main { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
-        .btn-main:hover { background: #1d4ed8; }
-        
-        .panel-actions { display: flex; gap: 6px; margin-top: 10px; width: 100%; justify-content: flex-end; }
-        .btn-action { border: 1px solid var(--border-color); background: white; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .btn-action.minus { color: var(--danger); }
-        .btn-action.plus { color: var(--success); }
-        .btn-action.del { background: var(--danger); color: white; border: none; }
+        .col-place { width: 60px; font-weight: bold; text-align: center; color: var(--text-muted); }
+        tr:nth-child(1) .col-place { color: #gold; color: #f59e0b; font-size: 18px; } /* Топ 1 */
+        .col-team { font-weight: bold; font-size: 16px; }
+        .col-points { text-align: right; font-weight: bold; color: var(--accent); width: 120px; }
+        .col-actions { width: 100px; text-align: center; }
 
-        .loading-notice { text-align: center; color: var(--text-muted); font-size: 14px; margin-top: 20px; }
+        /* Состав команды (выпадающий) */
+        .players-row { display: none; background: #1c2129; }
+        .players-box { padding: 15px; border-left: 3px solid var(--accent); }
+        .players-list { display: flex; gap: 15px; flex-wrap: wrap; list-style: none; }
+        .players-list li { background: var(--bg-card); padding: 5px 12px; border-radius: 3px; font-size: 14px; border: 1px solid var(--border); }
+
+        /* Вкладка Турниры */
+        .hidden { display: none !important; }
+        .tournaments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .tournament-card { background: var(--bg-card); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        .tournament-img { width: 100%; height: 160px; background-size: cover; background-position: center; background-color: #16191e; }
+        .tournament-info { padding: 15px; }
+        .tournament-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .status-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .status-badge.active { background: var(--active-green); color: white; }
+        .status-badge.inactive { background: var(--inactive-red); color: white; }
+
+        .btn-danger { background: var(--inactive-red) !important; color: white !important; }
     </style>
 </head>
 <body>
 
-    <!-- Панель администратора (?mode=admin) -->
-    <div class="admin-dashboard" id="adminPanel">
-        <div class="admin-title">🛠️ Управление сайтом AEL</div>
+<header>
+    <div class="logo">AEL <span>top teams</span></div>
+    <nav>
+        <button id="tab-teams" class="active" onclick="switchTab('teams')">Рейтинг команд</button>
+        <button id="tab-tourneys" onclick="switchTab('tourneys')">Турниры</button>
+    </nav>
+    <button class="admin-trigger" onclick="toggleAdminMode()">Войти как Админ</button>
+</header>
+
+<div class="container">
+
+    <!-- ПАНЕЛЬ АДМИНИСТРАТОРА -->
+    <div id="adminPanel" class="admin-panel">
+        <h3>Панель управления AEL</h3>
         
-        <div style="display:flex; gap:10px; margin-bottom:15px; border-bottom:1px solid #edf2f7; padding-bottom:10px;">
-            <button class="tab-btn active" id="admTabT" onclick="switchAdminForm('team')">Команды</button>
-            <button class="tab-btn" id="admTabTour" onclick="switchAdminForm('tourney')">Турниры</button>
-        </div>
-
-        <div id="admTeamForm">
-            <div class="form-row">
-                <input type="text" id="tName" placeholder="Название команды">
-                <input type="text" id="tLogo" placeholder="Имя картинки (напр. ./logo.png)">
-                <input type="number" id="tPoints" placeholder="Очки" value="0">
+        <!-- Управление командами -->
+        <div id="admin-teams-section">
+            <p><strong>Добавить / Изменить команду:</strong></p>
+            <div class="form-group">
+                <input type="text" id="teamName" placeholder="Название команды">
+                <input type="number" id="teamPoints" placeholder="Баллы (очки)">
+                <input type="text" id="teamPlayers" placeholder="Игроки через запятую (например: s1mple, b1t, jL)">
+                <button class="btn" onclick="saveTeam()">Сохранить команду</button>
             </div>
-            <button class="btn-main" onclick="createNewTeam()">Добавить команду</button>
         </div>
 
-        <div id="admTourneyForm" style="display:none;">
-            <div class="form-row">
-                <input type="text" id="trnName" placeholder="Название турнира">
-                <input type="text" id="trnLogo" placeholder="Имя картинки турнира">
-                <select id="trnStatus">
-                    <option value="true">Активен</option>
-                    <option value="false">Завершен</option>
+        <!-- Управление турнирами -->
+        <div id="admin-tourneys-section" class="hidden">
+            <p><strong>Добавить турнир:</strong></p>
+            <div class="form-group">
+                <input type="text" id="tourneyName" placeholder="Название турнира">
+                <input type="text" id="tourneyImg" placeholder="Ссылка на URL аватарки/лого">
+                <select id="tourneyStatus">
+                    <option value="active">Активно</option>
+                    <option value="inactive">Неактивно</option>
                 </select>
+                <button class="btn" onclick="saveTournament()">Добавить турнир</button>
             </div>
-            <button class="btn-main" onclick="createNewTournament()">Добавить турнир</button>
         </div>
     </div>
 
-    <!-- Основной интерфейс -->
-    <header>
-        <div class="logo-area">
-            <h1>AEL <span>Rating</span></h1>
+    <!-- ВКЛАДКА: КОМАНДЫ -->
+    <div id="page-teams">
+        <table class="ranking-table">
+            <thead>
+                <tr>
+                    <th class="col-place">#</th>
+                    <th class="col-team">Команда</th>
+                    <th class="col-points">Баллы</th>
+                    <th class="col-actions admin-only hidden">Действия</th>
+                </tr>
+            </thead>
+            <tbody id="teamsTableBody">
+                <!-- Данные загружаются скриптом -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ВКЛАДКА: ТУРНИРЫ -->
+    <div id="page-tourneys" class="hidden">
+        <div class="tournaments-grid" id="tournamentsGrid">
+            <!-- Данные загружаются скриптом -->
         </div>
-        <div class="nav-tabs">
-            <button class="tab-btn active" id="tabTeams" onclick="navigate('teams')">Рейтинг</button>
-            <button class="tab-btn" id="tabTourneys" onclick="navigate('tourneys')">Турниры</button>
-        </div>
-    </header>
+    </div>
 
-    <div id="loading" class="loading-notice">Загрузка актуальных данных из облака...</div>
+</div>
 
-    <!-- Вкладка Команд -->
-    <div class="container active" id="teamsTab"></div>
+<script>
+    // Изначальные (демо) данные, чтобы сайт не был пустым при первом запуске
+    let teams = [
+        { id: 1, name: "Natus Vincere", points: 1000, players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"] },
+        { id: 2, name: "FaZe Clan", points: 850, players: ["karrigan", "NiKo", "ropz", "broky", "rain"] },
+        { id: 3, name: "Team Spirit", points: 920, players: ["shalfey", "chopper", "magixx", "donk", "zoner"] }
+    ];
 
-    <!-- Вкладка Турниров -->
-    <div class="container" id="tourneysTab"></div>
+    let tournaments = [
+        { id: 1, name: "AEL Masters 2026", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500", status: "active" },
+        { id: 2, name: "AEL Spring Cup", img: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=500", status: "inactive" }
+    ];
 
-    <script>
-        // Уникальный ключ для твоей личной облачной базы данных на kvdb.io
-        const CLOUD_URL = 'https://kvdb.io/MTY1d3p4YmFjZ21zZHZyeG/ael_rating_storage';
+    let isAdmin = false;
+    let editingTeamId = null;
 
-        let data = { teams: [], tournaments: [] };
-        let isAdminMode = false;
+    // Инициализация при загрузке
+    renderTeams();
+    renderTournaments();
 
-        // Загрузка данных из облака
-        async function loadCloudData() {
-            try {
-                const response = await fetch(CLOUD_URL);
-                if (response.ok) {
-                    data = await response.json();
-                } else {
-                    // Если база пустая, ставим дефолт
-                    data = {
-                        teams: [{ id: 1, name: "Пример Команды", points: 1000, logo: "https://placehold.co/100x100", players: ["Игрок 1"] }],
-                        tournaments: [{ id: 1, name: "Первый Тест Турнир", logo: "https://placehold.co/100x100", isActive: true }]
-                    };
-                }
-                document.getElementById('loading').style.display = 'none';
-                renderPage();
-            } catch (e) {
-                console.error("Ошибка загрузки данных", e);
-            }
-        }
-
-        // Сохранение данных в облако
-        async function saveCloudData() {
-            renderPage(); // Сразу обновляем интерфейс у себя
-            try {
-                await fetch(CLOUD_URL, {
-                    method: 'PUT',
-                    body: JSON.stringify(data)
-                });
-            } catch (e) {
-                alert('Ошибка сохранения в облако!');
-            }
-        }
-
-        function checkAuth() {
-            const urlParams = new URLSearchParams(window.location.search);
-            isAdminMode = urlParams.get('mode') === 'admin';
-            if (isAdminMode) {
-                document.getElementById('adminPanel').classList.add('visible');
-            }
-            loadCloudData();
-        }
-
-        // Автообновление для гостей каждые 30 секунд (чтобы видели изменения админа)
-        setInterval(() => {
-            if (!isAdminMode) loadCloudData();
-        }, 30000);
-
-        window.addEventListener('DOMContentLoaded', checkAuth);
-
-        function navigate(tab) {
-            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-            if(tab === 'teams') {
-                document.getElementById('teamsTab').classList.add('active');
-                document.getElementById('tabTeams').classList.add('active');
+    function toggleAdminMode() {
+        if (!isAdmin) {
+            let pass = prompt("Введите пароль администратора:");
+            if (pass === "adminAEL") { // Временный простой пароль
+                isAdmin = true;
+                document.getElementById('adminPanel').style.display = 'block';
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                alert("Вы вошли как администратор!");
+                renderTeams();
             } else {
-                document.getElementById('tourneysTab').classList.add('active');
-                document.getElementById('tabTourneys').classList.add('active');
+                alert("Неверный пароль!");
             }
+        } else {
+            isAdmin = false;
+            document.getElementById('adminPanel').style.display = 'none';
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
         }
+    }
 
-        function switchAdminForm(type) {
-            document.getElementById('admTabT').classList.toggle('active', type === 'team');
-            document.getElementById('admTabTour').classList.toggle('active', type === 'tourney');
-            document.getElementById('admTeamForm').style.display = type === 'team' ? 'block' : 'none';
-            document.getElementById('admTourneyForm').style.display = type === 'tourney' ? 'block' : 'none';
+    function switchTab(tab) {
+        document.getElementById('tab-teams').classList.remove('active');
+        document.getElementById('tab-tourneys').classList.remove('active');
+        document.getElementById('page-teams').classList.add('hidden');
+        document.getElementById('page-tourneys').classList.add('hidden');
+        document.getElementById('admin-teams-section').classList.add('hidden');
+        document.getElementById('admin-tourneys-section').classList.add('hidden');
+
+        if (tab === 'teams') {
+            document.getElementById('tab-teams').classList.add('active');
+            document.getElementById('page-teams').classList.remove('hidden');
+            document.getElementById('admin-teams-section').classList.remove('hidden');
+        } else {
+            document.getElementById('tab-tourneys').classList.add('active');
+            document.getElementById('page-tourneys').classList.remove('hidden');
+            document.getElementById('admin-tourneys-section').classList.remove('hidden');
         }
+    }
 
-        function renderPage() {
-            // Сортировка команд по очкам
-            let sortedTeams = [...data.teams].sort((a, b) => b.points - a.points);
-            const tContainer = document.getElementById('teamsTab');
-            tContainer.innerHTML = '';
+    // Рендеринг таблицы команд (с автосортировкой по баллам)
+    function renderTeams() {
+        // Сортировка: у кого больше баллов — тот выше
+        teams.sort((a, b) => b.points - a.points);
+        
+        const tbody = document.getElementById('teamsTableBody');
+        tbody.innerHTML = '';
 
-            sortedTeams.forEach(team => {
-                const card = document.createElement('div');
-                card.className = 'team-card';
-                
-                let pList = team.players.map(p => `
-                    <div class="player-row">
-                        <span>👤 ${p}</span>
-                        ${isAdminMode ? `<button class="btn-action minus" onclick="removePlayer(${team.id}, '${p}')">×</button>` : ''}
+        teams.forEach((team, index) => {
+            // Строка команды
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="col-place" onclick="togglePlayers(${team.id})">${index + 1}</td>
+                <td class="col-team" onclick="togglePlayers(${team.id})">${team.name}</td>
+                <td class="col-points" onclick="togglePlayers(${team.id})">${team.points} <span style="font-size:11px;color:var(--text-muted)">pts</span></td>
+                <td class="col-actions admin-only ${isAdmin ? '' : 'hidden'}">
+                    <button onclick="editTeam(${team.id})" style="background:none; border:none; color:var(--accent); cursor:pointer; margin-right:10px;">✏️</button>
+                    <button onclick="deleteTeam(${team.id})" style="background:none; border:none; color:var(--inactive-red); cursor:pointer;">❌</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+
+            // Скрытая строка с игроками
+            const playersTr = document.createElement('tr');
+            playersTr.id = `players-${team.id}`;
+            playersTr.className = 'players-row';
+            
+            let playersHtml = team.players.map(p => `<li>${p}</li>`).join('');
+            if(team.players.length === 0) playersHtml = '<span style="color:var(--text-muted); font-size:13px;">Состав не указан</span>';
+
+            playersTr.innerHTML = `
+                <td colspan="${isAdmin ? 4 : 3}">
+                    <div class="players-box">
+                        <strong style="font-size:12px; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:8px;">Текущий ростер:</strong>
+                        <ul class="players-list">${playersHtml}</ul>
                     </div>
-                `).join('');
+                </td>
+            `;
+            tbody.appendChild(playersTr);
+        });
+    }
 
-                let adminControls = isAdminMode ? `
-                    <div class="panel-actions" onclick="event.stopPropagation()">
-                        <button class="btn-action plus" onclick="updatePoints(${team.id}, 50)">+50 очков</button>
-                        <button class="btn-action minus" onclick="updatePoints(${team.id}, -50)">-50 очков</button>
-                        <button class="btn-action del" onclick="deleteTeam(${team.id})">Удалить команду</button>
+    function togglePlayers(id) {
+        const row = document.getElementById(`players-${id}`);
+        row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
+    }
+
+    // Функции админки для Команд
+    function saveTeam() {
+        const name = document.getElementById('teamName').value.trim();
+        const points = parseInt(document.getElementById('teamPoints').value) || 0;
+        const playersString = document.getElementById('teamPlayers').value;
+        const players = playersString ? playersString.split(',').map(p => p.trim()) : [];
+
+        if (!name) return alert('Введите название команды!');
+
+        if (editingTeamId) {
+            // Редактирование
+            const team = teams.find(t => t.id === editingTeamId);
+            team.name = name;
+            team.points = points;
+            team.players = players;
+            editingTeamId = null;
+        } else {
+            // Создание новой
+            teams.push({ id: Date.now(), name, points, players });
+        }
+
+        // Очистка формы
+        document.getElementById('teamName').value = '';
+        document.getElementById('teamPoints').value = '';
+        document.getElementById('teamPlayers').value = '';
+        
+        renderTeams();
+    }
+
+    function editTeam(id) {
+        const team = teams.find(t => t.id === id);
+        document.getElementById('teamName').value = team.name;
+        document.getElementById('teamPoints').value = team.points;
+        document.getElementById('teamPlayers').value = team.players.join(', ');
+        editingTeamId = id;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteTeam(id) {
+        if(confirm("Удалить эту команду?")) {
+            teams = teams.filter(t => t.id !== id);
+            renderTeams();
+        }
+    }
+
+    // Рендеринг Турниров
+    function renderTournaments() {
+        const grid = document.getElementById('tournamentsGrid');
+        grid.innerHTML = '';
+
+        tournaments.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'tournament-card';
+            
+            const badgeClass = t.status === 'active' ? 'active' : 'inactive';
+            const badgeText = t.status === 'active' ? 'Активно' : 'Неактивно';
+
+            card.innerHTML = `
+                <div class="tournament-img" style="background-image: url('${t.img || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500'}')"></div>
+                <span class="status-badge ${badgeClass}">${badgeText}</span>
+                <div class="tournament-info">
+                    <div class="tournament-title">${t.name}</div>
+                    <div class="admin-only ${isAdmin ? '' : 'hidden'}" style="margin-top:10px; display:flex; gap:10px;">
+                        <button class="btn" onclick="toggleTourneyStatus(${t.id})" style="padding:4px 8px; font-size:12px;">Сменить статус</button>
+                        <button class="btn btn-danger" onclick="deleteTourney(${t.id})" style="padding:4px 8px; font-size:12px;">Удалить</button>
                     </div>
-                    <div class="form-row" style="margin-top:12px;" onclick="event.stopPropagation()">
-                        <input type="text" id="inpPl-${team.id}" placeholder="Ник игрока" style="padding:6px;">
-                        <button class="btn-main" style="padding:6px 12px;" onclick="addPlayer(${team.id})">+</button>
-                    </div>
-                ` : '';
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
 
-                card.innerHTML = `
-                    <div class="team-layout" onclick="togglePlayers(${team.id})">
-                        <div class="team-left">
-                            <div class="team-name">${team.name}</div>
-                        </div>
-                        <div class="team-right-zone">
-                            <img src="${team.logo || 'https://placehold.co/100x100'}" class="team-avatar">
-                            <div class="points-frame">${team.points} PTS</div>
-                        </div>
-                    </div>
-                    <div class="players-box" id="box-${team.id}">
-                        <h4 style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Состав команды:</h4>
-                        ${pList || '<div style="color:var(--text-muted); font-size:13px;">Игроков пока нет</div>'}
-                        ${adminControls}
-                    </div>
-                `;
-                tContainer.appendChild(card);
-            });
+    // Функции админки для Турниров
+    function saveTournament() {
+        const name = document.getElementById('tourneyName').value.trim();
+        const img = document.getElementById('tourneyImg').value.trim();
+        const status = document.getElementById('tourneyStatus').value;
 
-            // Рендер турниров
-            const tourContainer = document.getElementById('tourneysTab');
-            tourContainer.innerHTML = '';
+        if (!name) return alert('Введите название турнира!');
 
-            data.tournaments.forEach(trn => {
-                const card = document.createElement('div');
-                card.className = 'tourney-card';
-                card.innerHTML = `
-                    <div class="team-left">
-                        <img src="${trn.logo || 'https://placehold.co/100x100'}" class="team-avatar" style="border-radius:8px;">
-                        <div class="team-name" style="font-size:18px;">${trn.name}</div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="status-badge ${trn.isActive ? 'active' : 'inactive'}">${trn.isActive ? 'Активен' : 'Завершен'}</span>
-                        ${isAdminMode ? `
-                            <button class="btn-action" onclick="toggleTourney(${trn.id})">Сменить статус</button>
-                            <button class="btn-action del" onclick="deleteTourney(${trn.id})">×</button>
-                        ` : ''}
-                    </div>
-                `;
-                tourContainer.appendChild(card);
-            });
+        tournaments.push({ id: Date.now(), name, img, status });
+        
+        document.getElementById('tourneyName').value = '';
+        document.getElementById('tourneyImg').value = '';
+        
+        renderTournaments();
+    }
+
+    function toggleTourneyStatus(id) {
+        const tourney = tournaments.find(t => t.id === id);
+        tourney.status = tourney.status === 'active' ? 'inactive' : 'active';
+        renderTournaments();
+    }
+
+    function deleteTourney(id) {
+        if(confirm("Удалить турнир?")) {
+            tournaments = tournaments.filter(t => t.id !== id);
+            renderTournaments();
         }
-
-        function togglePlayers(id) {
-            document.getElementById(`box-${id}`).classList.toggle('open');
-        }
-
-        // --- ФУНКЦИИ УПРАВЛЕНИЯ (АДМИН) ---
-        function createNewTeam() {
-            const name = document.getElementById('tName').value.trim();
-            const logo = document.getElementById('tLogo').value.trim();
-            const points = parseInt(document.getElementById('tPoints').value) || 0;
-            if(!name) return alert('Укажите название!');
-            data.teams.push({ id: Date.now(), name, logo, points, players: [] });
-            document.getElementById('tName').value = '';
-            document.getElementById('tLogo').value = '';
-            saveCloudData();
-        }
-
-        function updatePoints(id, amt) {
-            const team = data.teams.find(t => t.id === id);
-            if(team) { team.points += amt; saveCloudData(); }
-        }
-
-        function deleteTeam(id) {
-            if(confirm('Удалить эту команду?')) { data.teams = data.teams.filter(t => t.id !== id); saveCloudData(); }
-        }
-
-        function addPlayer(tId) {
-            const inp = document.getElementById(`inpPl-${tId}`);
-            const pName = inp.value.trim();
-            if(!pName) return;
-            const team = data.teams.find(t => t.id === tId);
-            if(team) { team.players.push(pName); inp.value = ''; saveCloudData(); }
-        }
-
-        function removePlayer(tId, pName) {
-            const team = data.teams.find(t => t.id === tId);
-            if(team) { team.players = team.players.filter(p => p !== pName); saveCloudData(); }
-        }
-
-        function createNewTournament() {
-            const name = document.getElementById('trnName').value.trim();
-            const logo = document.getElementById('trnLogo').value.trim();
-            const isActive = document.getElementById('trnStatus').value === 'true';
-            if(!name) return alert('Укажите название турнира!');
-            data.tournaments.push({ id: Date.now(), name, logo, isActive });
-            document.getElementById('trnName').value = '';
-            document.getElementById('trnLogo').value = '';
-            saveCloudData();
-        }
-
-        function toggleTourney(id) {
-            const trn = data.tournaments.find(t => t.id === id);
-            if(trn) { trn.isActive = !trn.isActive; saveCloudData(); }
-        }
-
-        function deleteTourney(id) {
-            data.tournaments = data.tournaments.filter(t => t.id !== id); saveCloudData();
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
