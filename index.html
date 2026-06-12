@@ -466,7 +466,7 @@
 const SERVER_URL = 'https://onrender.com';
 
 function loadFromServer() {
-    fetch(\${SERVER_URL}/get-teams)
+fetch(${SERVER_URL}/get-teams)
         .then(res => res.json())
         .then(data => {
             if (data && typeof data === 'object' && !Array.isArray(data)) {
