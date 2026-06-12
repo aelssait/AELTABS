@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AEL top teams | CS2 Полная Система</title>
+    <title>AEL top teams | CS2 Полная Админ-Система</title>
     <style>
         :root {
             --bg-main: #13161b;
@@ -94,23 +94,17 @@
         button.btn { background: var(--accent); color: var(--bg-header); border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: var(--transition-smooth); }
         button.btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
         
-        .btn-status { padding: 4px 8px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; transition: var(--transition-smooth); }
+        .btn-status { padding: 6px 12px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; transition: var(--transition-smooth); }
         .btn-status.active-status { background: var(--active-green); color: #fff; }
         .btn-status.eliminated-status { background: var(--inactive-red); color: #fff; }
 
         .form-inline { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
         .form-inline input, .form-inline select { background: var(--bg-main); border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 4px; }
 
-        /* Фильтры топа */
-        .filter-controls { margin-bottom: 15px; display: flex; gap: 10px; }
-        .filter-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; transition: var(--transition-smooth); }
-        .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(229, 169, 59, 0.05); }
-
         /* Таблица рейтинга */
         .ranking-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
         .ranking-table th { color: var(--text-muted); text-align: left; padding: 10px 20px; font-size: 13px; text-transform: uppercase; }
         
-        /* Базовые стили ячеек */
         .ranking-table td { background: var(--bg-card); padding: 15px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition-smooth); }
         .ranking-table td:first-child { border-left: 1px solid var(--border); border-top-left-radius: 6px; border-bottom-left-radius: 6px; width: 70px; text-align: center; font-size: 16px; font-weight: bold; }
         .ranking-table td:last-child { border-right: 1px solid var(--border); border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
@@ -153,11 +147,15 @@
         .col-points { text-align: right; font-weight: bold; color: var(--accent); font-size: 18px; width: 150px; transition: var(--transition-smooth); }
         .col-points span { font-size: 11px; color: var(--text-muted); margin-left: 5px; text-transform: uppercase; }
 
-        /* Анимации игроков */
+        /* Игроки и выпадающий контент */
         .players-row td { padding: 0 !important; background: none !important; border: none !important; }
         .players-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .players-wrapper.open { max-height: 200px; }
         .players-box { padding: 15px 20px; background: rgba(18, 21, 26, 0.95); border-radius: 6px; margin-top: -5px; margin-bottom: 10px; border: 1px solid var(--border); border-left: 4px solid var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        
+        .players-header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .won-text { font-size: 13px; color: var(--accent); font-style: italic; }
+
         .players-list { display: flex; gap: 10px; flex-wrap: wrap; list-style: none; }
         .players-list li { background: var(--bg-main); padding: 6px 14px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border); transition: var(--transition-smooth); }
         .players-list li:hover { border-color: var(--accent); transform: scale(1.05); }
@@ -167,7 +165,6 @@
         .tournament-card { background: var(--bg-card); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); position: relative; transition: var(--transition-smooth); }
         .tournament-card:hover { transform: translateY(-5px); border-color: var(--accent); }
         
-        /* Контейнер для превью турнира */
         .tournament-img { height: 160px; background: #262c35; display: flex; align-items: center; justify-content: center; font-size: 40px; overflow: hidden; }
         .tournament-img img { width: 100%; height: 100%; object-fit: cover; }
         
@@ -187,7 +184,7 @@
         .pick-team-btn.result-winner { border-color: var(--active-green) !important; background: rgba(34, 197, 94, 0.15) !important; }
         .pick-team-btn.result-loser { border-color: var(--inactive-red) !important; opacity: 0.5; }
 
-        /* Конструктор пар */
+        /* Секция Конструктора пар */
         .admin-drag-section { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 10px; }
         .drag-pool { background: var(--bg-main); border: 1px dashed var(--border); padding: 15px; border-radius: 6px; max-height: 250px; overflow-y: auto; }
         .drag-item { background: var(--bg-card); border: 1px solid var(--border); padding: 8px 12px; margin-bottom: 8px; border-radius: 4px; cursor: grab; }
@@ -215,7 +212,7 @@
         🎉 ПОЗДРАВЛЯЕМ! Вы угадали абсолютно все матчи! Активирован скрытый стиль MASTER PICKEM!
     </div>
 
-    <!-- ================= ПОЛНОЦЕННАЯ МОНОЛИТНАЯ АДМИН-ПАНЕЛЬ ================= -->
+    <!-- ================= ПОЛНАЯ АДМИН-ПАНЕЛЬ ================= -->
     <div id="adminPanel" class="admin-panel">
         <h3>Панель управления AEL (Всё в одном)</h3>
         
@@ -227,14 +224,9 @@
                 <input type="text" id="newTeamLogo" placeholder="Эмодзи или URL лого">
                 <input type="number" id="newTeamPoints" placeholder="Очки (Баллы)">
                 <input type="text" id="newTeamPlayers" placeholder="Игроки (через запятую)">
+                <input type="text" id="newTeamWon" style="width: 220px;" placeholder="Победили в (Турниры)">
                 <button class="btn" onclick="addNewTeam()">Добавить</button>
             </div>
-        </div>
-
-        <!-- Блок изменения статусов выбывания -->
-        <div class="admin-sub-block">
-            <h4>Статусы команд (Участвует / Выбыл) — управляешь ты вручную:</h4>
-            <div id="adminTeamsStatusList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:10px;"></div>
         </div>
 
         <!-- Блок создания турниров -->
@@ -275,15 +267,10 @@
     </div>
 
 
-    <!-- ================= ПОЛЬЗОВАТЕЛЬСКИЕ ИНТЕРФЕЙСЫ ================= -->
+    <!-- ================= ПОЛЬЗОВАТЕЛЬСКИЕ СТРАНИЦЫ ================= -->
 
-    <!-- Вкладка: Рейтинг -->
+    <!-- Вкладка: Рейтинг (Чистый сплошной список БЕЗ ВКЛАДОК-ФИЛЬТРОВ) -->
     <div id="page-teams">
-        <div class="filter-controls">
-            <button id="filter-all" class="filter-btn active" onclick="setTeamFilter('all')">Все команды</button>
-            <button id="filter-active" class="filter-btn" onclick="setTeamFilter('active')">В игре</button>
-            <button id="filter-out" class="filter-btn" onclick="setTeamFilter('out')">Выбыли</button>
-        </div>
         <table class="ranking-table">
             <thead>
                 <tr>
@@ -327,14 +314,14 @@
 
 <script>
     let teamsData = JSON.parse(localStorage.getItem('ael_teams_list')) || [
-        { name: "Natus Vincere", points: 1200, logo: "👑", isEliminated: false, players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"] },
-        { name: "Team Spirit", points: 1100, logo: "🐉", isEliminated: false, players: ["donk", "shalfey", "chopper", "magixx", "zoner"] },
-        { name: "FaZe Clan", points: 950, logo: "🖲️", isEliminated: false, players: ["karrigan", "rain", "ropz", "broky", "frozen"] },
-        { name: "Vitality", points: 910, logo: "🐝", isEliminated: false, players: ["ZywOo", "apEX", "Spinx", "FlameZ", "mezii"] },
-        { name: "G2 Esports", points: 880, logo: "🥷", isEliminated: false, players: ["Snax", "NiKo", "m0NESY", "hunter", "malbsMd"] },
-        { name: "MOUZ", points: 820, logo: "🐭", isEliminated: false, players: ["siuhy", "xertioN", "torzsi", "Jimpphat", "Brollan"] },
-        { name: "Virtus.pro", points: 750, logo: "🐻", isEliminated: false, players: ["Jame", "FL1T", "fame", "electroNic", "n0rb3r7"] },
-        { name: "Astralis", points: 710, logo: "⭐", isEliminated: false, players: ["dev1ce", "staehr", "br0", "jabbi", "stavn"] }
+        { name: "Natus Vincere", points: 1200, logo: "👑", isEliminated: false, players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"], won: "Masters 2026" },
+        { name: "Team Spirit", points: 1100, logo: "🐉", isEliminated: false, players: ["donk", "shalfey", "chopper", "magixx", "zoner"], won: "" },
+        { name: "FaZe Clan", points: 950, logo: "🖲️", isEliminated: false, players: ["karrigan", "rain", "ropz", "broky", "frozen"], won: "" },
+        { name: "Vitality", points: 910, logo: "🐝", isEliminated: false, players: ["ZywOo", "apEX", "Spinx", "FlameZ", "mezii"], won: "" },
+        { name: "G2 Esports", points: 880, logo: "🥷", isEliminated: false, players: ["Snax", "NiKo", "m0NESY", "hunter", "malbsMd"], won: "" },
+        { name: "MOUZ", points: 820, logo: "🐭", isEliminated: false, players: ["siuhy", "xertioN", "torzsi", "Jimpphat", "Brollan"], won: "" },
+        { name: "Virtus.pro", points: 750, logo: "🐻", isEliminated: false, players: ["Jame", "FL1T", "fame", "electroNic", "n0rb3r7"], won: "" },
+        { name: "Astralis", points: 710, logo: "⭐", isEliminated: false, players: ["dev1ce", "staehr", "br0", "jabbi", "stavn"], won: "" }
     ];
 
     let pickemSystem = JSON.parse(localStorage.getItem('ael_bracket_system')) || {
@@ -350,7 +337,6 @@
         { name: "AEL Spring Cup", icon: "🌱", status: "inactive" }
     ];
 
-    let currentFilter = 'all'; 
     let isAdmin = false;
 
     saveAndSync();
@@ -369,7 +355,6 @@
         renderTournaments();
         renderWholeBracket();
         if (isAdmin) {
-            renderAdminTeamsStatusDashboard();
             setupAdminMatchBuilder();
         }
     }
@@ -403,16 +388,8 @@
             document.getElementById('adminBtn').classList.remove('active');
             document.getElementById('adminBtn').innerText = "Войти как Admin";
             document.getElementById('adminPanel').style.display = 'none';
+            renderAll();
         }
-    }
-
-    function setTeamFilter(filter) {
-        currentFilter = filter;
-        document.getElementById('filter-all').classList.remove('active');
-        document.getElementById('filter-active').classList.remove('active');
-        document.getElementById('filter-out').classList.remove('active');
-        document.getElementById(`filter-${filter}`).classList.add('active');
-        renderRatingTable();
     }
 
     function renderRatingTable() {
@@ -424,10 +401,6 @@
         sorted.forEach((team, originalIdx) => {
             let actualIdx = teamsData.findIndex(t => t.name === team.name);
 
-            if(currentFilter === 'active' && team.isEliminated) return;
-            if(currentFilter === 'out' && !team.isEliminated) return;
-
-            // Высчитываем топ-классы для изменения размера
             let rankClass = '';
             if (originalIdx === 0) rankClass = 'top-1';
             else if (originalIdx === 1) rankClass = 'top-2';
@@ -456,13 +429,27 @@
             `;
             tbody.appendChild(tr);
 
+            // Кнопка быстрого изменения статуса команды (Только для Админа)
+            let adminToggleBtn = isAdmin ? `
+                <button class="btn-status ${team.isEliminated ? 'eliminated-status' : 'active-status'}" 
+                        onclick="event.stopPropagation(); toggleTeamElimination(${actualIdx});">
+                    ${team.isEliminated ? 'Вернуть в игру' : 'Сделать выбывшей'}
+                </button>
+            ` : '';
+
             const pTr = document.createElement('tr');
             pTr.className = 'players-row';
             let listHtml = (team.players || []).map(p => `<li>${p}</li>`).join('');
+            let wonHtml = team.won ? `<div class="won-text">🏆 Победили в: <b>${team.won}</b></div>` : '<div></div>';
+
             pTr.innerHTML = `
                 <td colspan="3">
                     <div class="players-wrapper" id="wrapper-${actualIdx}">
                         <div class="players-box">
+                            <div class="players-header-box">
+                                ${wonHtml}
+                                ${adminToggleBtn}
+                            </div>
                             <ul class="players-list">${listHtml}</ul>
                         </div>
                     </div>
@@ -477,48 +464,36 @@
         if(w) w.classList.toggle('open');
     }
 
+    function toggleTeamElimination(idx) {
+        teamsData[idx].isEliminated = !teamsData[idx].isEliminated;
+        saveAndSync();
+        renderAll();
+        // Сохраняем выпадающий блок открытым для удобства администрирования
+        setTimeout(() => togglePlayersList(idx), 40);
+    }
+
     function addNewTeam() {
         let name = document.getElementById('newTeamName').value.trim();
         let logo = document.getElementById('newTeamLogo').value.trim() || "👥";
         let points = parseInt(document.getElementById('newTeamPoints').value) || 0;
         let playersArr = document.getElementById('newTeamPlayers').value.split(',').map(p => p.trim()).filter(Boolean);
+        let won = document.getElementById('newTeamWon').value.trim();
 
         if(!name) return alert("Введите имя команды");
-        teamsData.push({ name, logo, points, isEliminated: false, players: playersArr });
+        teamsData.push({ name, logo, points, isEliminated: false, players: playersArr, won: won });
         
         saveAndSync(); renderAll();
         document.getElementById('newTeamName').value = '';
         document.getElementById('newTeamLogo').value = '';
         document.getElementById('newTeamPoints').value = '';
         document.getElementById('newTeamPlayers').value = '';
-    }
-
-    function renderAdminTeamsStatusDashboard() {
-        const container = document.getElementById('adminTeamsStatusList');
-        container.innerHTML = '';
-        teamsData.forEach((team, idx) => {
-            const div = document.createElement('div');
-            div.style = "background:var(--bg-main); padding:10px; border:1px solid var(--border); border-radius:4px; display:flex; justify-content:space-between; align-items:center;";
-            div.innerHTML = `
-                <span style="font-size:13px; font-weight:bold;">${team.name}</span>
-                <button class="btn-status ${team.isEliminated ? 'eliminated-status':'active-status'}" onclick="toggleTeamElimination(${idx})">
-                    ${team.isEliminated ? 'Выбыла' : 'В игре'}
-                </button>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function toggleTeamElimination(idx) {
-        teamsData[idx].isEliminated = !teamsData[idx].isEliminated;
-        saveAndSync(); renderAll();
+        document.getElementById('newTeamWon').value = '';
     }
 
     function renderTournaments() {
         const grid = document.getElementById('tournamentsGrid');
         grid.innerHTML = '';
         tournaments.forEach(t => {
-            // Проверяем, является ли иконка ссылкой на изображение
             let previewHtml = (t.icon && t.icon.startsWith('http')) 
                 ? `<img src="${t.icon}" alt="${t.name}">` 
                 : t.icon || '🎮';
@@ -637,11 +612,7 @@
         }
 
         let next = st + 1;
-        if(next <= 3) {
-            pickemSystem.activeStage = next;
-        } else {
-            pickemSystem.activeStage = 4;
-        }
+        if(next <= 3) { pickemSystem.activeStage = next; } else { pickemSystem.activeStage = 4; }
         saveAndSync(); renderAll(); alert("Результаты этапа зафиксированы!");
     }
 
