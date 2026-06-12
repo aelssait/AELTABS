@@ -5,83 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AEL top teams | CS2 Рейтинг</title>
     <style>
-        /* Стилевая палитра в духе HLTV */
         :root {
             --bg-main: #1b1f26;
             --bg-card: #232932;
             --bg-header: #16191e;
             --text-main: #e2e8f0;
             --text-muted: #94a3b8;
-            --accent: #e5a93b; /* Фирменный желтый HLTV */
+            --accent: #e5a93b; 
             --accent-hover: #ffc257;
             --active-green: #22c55e;
             --inactive-red: #ef4444;
             --border: #2e3641;
+            --transition-fast: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 50px; }
+        
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-main); 
+            padding-bottom: 50px; 
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        /* Шапка сайта */
+        /* Фоновая эмблема AEL */
+        .bg-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vmin;
+            height: 70vmin;
+            background-image: url('photo_2026-06-12_18-39-10.jpg');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: screen;
+        }
+
+        header, .container { position: relative; z-index: 1; }
+
         header { background-color: var(--bg-header); border-bottom: 2px solid var(--accent); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .logo { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
         .logo span { color: var(--accent); }
         
-        nav button { background: none; border: none; color: var(--text-main); font-size: 16px; margin-left: 20px; cursor: pointer; padding: 5px 10px; transition: 0.2s; }
+        nav { display: flex; gap: 10px; }
+        nav button { background: none; border: none; color: var(--text-main); font-size: 16px; cursor: pointer; padding: 8px 12px; transition: var(--transition-fast); border-bottom: 2px solid transparent; }
         nav button.active, nav button:hover { color: var(--accent); border-bottom: 2px solid var(--accent); }
 
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
 
-        /* Кнопка Админа и Панель */
-        .admin-trigger { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        /* Анимация плавного появления страниц */
+        .page-fade { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-trigger { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 15px; border-radius: 4px; cursor: pointer; transition: var(--transition-fast); }
         .admin-trigger:hover { border-color: var(--accent); color: var(--text-main); }
         .admin-panel { background: var(--bg-card); border: 1px solid var(--accent); padding: 20px; border-radius: 6px; margin-bottom: 20px; display: none; }
         .admin-panel h3 { margin-bottom: 15px; color: var(--accent); }
         
-        /* Формы */
-        .form-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        input, select { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 4px; flex: 1; min-width: 150px; }
-        input:focus { border-color: var(--accent); outline: none; }
-        button.btn { background: var(--accent); color: var(--bg-header); border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        button.btn:hover { background: var(--accent-hover); }
+        .form-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+        input, select { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 4px; flex: 1; min-width: 150px; transition: var(--transition-fast); }
+        input:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 8px rgba(229, 169, 59, 0.2); }
+        button.btn { background: var(--accent); color: var(--bg-header); border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: var(--transition-fast); }
+        button.btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
-        /* Таблица Рейтинга */
-        .ranking-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 6px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .ranking-table th { background: var(--bg-header); color: var(--text-muted); text-align: left; padding: 15px; font-size: 14px; text-transform: uppercase; }
-        .ranking-table td { padding: 15px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        /* ТАБЛИЦА С КОМАНДАМИ */
+        .ranking-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .ranking-table th { color: var(--text-muted); text-align: left; padding: 10px 20px; font-size: 14px; text-transform: uppercase; }
+        
+        .ranking-table td { background: rgba(35, 41, 50, 0.9); padding: 25px 20px; vertical-align: middle; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); backdrop-filter: blur(2px); transition: var(--transition-fast); }
+        .ranking-table td:first-child { border-left: 1px solid var(--border); border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        .ranking-table td:last-child { border-right: 1px solid var(--border); border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        
         .ranking-table tr.team-row { cursor: pointer; }
-        .ranking-table tr.team-row:hover td { background: rgba(255,255,255,0.02); }
+        .ranking-table tr.team-row:hover td { background: rgba(43, 51, 62, 0.95); border-color: var(--accent); }
         
-        .col-place { width: 60px; font-weight: bold; text-align: center; color: var(--text-muted); }
-        tr:nth-child(1) .col-place { color: #f59e0b; font-size: 18px; } /* Топ 1 */
+        .col-place { width: 70px; font-size: 20px; font-weight: bold; text-align: center; color: var(--text-muted); }
+        tr:nth-child(2) .col-place { color: #f59e0b; font-size: 24px; }
         
-        /* Стили для Аватарок команд */
-        .team-info-cell { display: flex; align-items: center; gap: 12px; }
-        .team-logo { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; background: #16191e; border: 1px solid var(--border); }
-        .team-logo-placeholder { width: 32px; height: 32px; border-radius: 4px; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-muted); font-size: 14px; text-transform: uppercase; }
+        .team-info-cell { display: flex; align-items: center; gap: 15px; position: relative; }
+        .team-logo { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; background: #16191e; border: 1px solid var(--border); }
+        .team-logo-placeholder { width: 45px; height: 45px; border-radius: 6px; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-muted); font-size: 18px; text-transform: uppercase; }
         
-        .col-team { font-weight: bold; font-size: 16px; }
-        .col-points { text-align: right; font-weight: bold; color: var(--accent); width: 100px; }
+        .team-name-block { display: flex; flex-direction: column; gap: 4px; }
+        .col-team { font-weight: bold; font-size: 18px; }
         
-        /* Блок лайков */
-        .col-reactions { width: 160px; text-align: center; }
+        .status-tag { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-left: 10px; }
+        .status-tag.in_game { background: rgba(34, 197, 94, 0.2); color: var(--active-green); border: 1px solid var(--active-green); }
+        .status-tag.out { background: rgba(239, 68, 68, 0.2); color: var(--inactive-red); border: 1px solid var(--inactive-red); }
+        
+        .winner-tag { font-size: 13px; color: #f59e0b; font-weight: 600; display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+
+        .col-points { text-align: right; font-weight: bold; color: var(--accent); font-size: 18px; width: 140px; }
+        .col-points span { font-size: 12px; color: var(--text-muted); font-weight: normal; margin-left: 4px; }
+        
+        .col-reactions { width: 180px; text-align: center; }
         .reaction-buttons { display: flex; gap: 8px; justify-content: center; }
-        .btn-like, .btn-dislike { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
+        .btn-like, .btn-dislike { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; transition: var(--transition-fast); }
         .btn-like:hover { border-color: var(--active-green); color: var(--active-green); }
         .btn-dislike:hover { border-color: var(--inactive-red); color: var(--inactive-red); }
+        .btn-reacted { opacity: 0.4; cursor: not-allowed !important; background: rgba(255,255,255,0.01) !important; border-color: var(--border) !important; color: var(--text-muted) !important; }
 
-        .col-actions { width: 100px; text-align: center; }
+        .col-actions { width: 280px; text-align: center; }
+        .status-admin-btns { display: flex; gap: 4px; margin-bottom: 8px; justify-content: center; }
+        .btn-status { border: none; padding: 4px 8px; font-size: 11px; border-radius: 3px; cursor: pointer; font-weight: bold; color: #fff; transition: var(--transition-fast); }
+        .btn-status.btn-in { background: var(--active-green); }
+        .btn-status.btn-out { background: var(--inactive-red); }
+        .btn-status.btn-reset { background: var(--text-muted); }
+        .btn-status:hover { filter: brightness(1.2); }
 
-        /* Состав команды (выпадающий) */
-        .players-row { display: none; background: #1c2129; }
-        .players-box { padding: 15px; border-left: 3px solid var(--accent); }
+        .players-row td { padding: 0; background: none; backdrop-filter: none; border: none; }
+        .players-box { padding: 20px; background: rgba(28, 33, 41, 0.9); border-left: 4px solid var(--accent); border-radius: 0 0 6px 6px; margin-top: -10px; margin-bottom: 10px; border: 1px solid var(--border); border-left: 4px solid var(--accent); }
         .players-list { display: flex; gap: 15px; flex-wrap: wrap; list-style: none; }
-        .players-list li { background: var(--bg-card); padding: 5px 12px; border-radius: 3px; font-size: 14px; border: 1px solid var(--border); }
+        .players-list li { background: var(--bg-card); padding: 8px 16px; border-radius: 4px; font-size: 14px; border: 1px solid var(--border); }
 
-        /* Вкладка Турниры */
+        /* ТУРНИРЫ */
         .hidden { display: none !important; }
         .tournaments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .tournament-card { background: var(--bg-card); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        .tournament-card { background: rgba(35, 41, 50, 0.9); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); position: relative; transition: var(--transition-fast); }
+        .tournament-card:hover { transform: translateY(-4px); border-color: var(--accent); }
         .tournament-img { width: 100%; height: 160px; background-size: cover; background-position: center; background-color: #16191e; }
         .tournament-info { padding: 15px; }
         .tournament-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
@@ -90,15 +141,38 @@
         .status-badge.inactive { background: var(--inactive-red); color: white; }
 
         .btn-danger { background: var(--inactive-red) !important; color: white !important; }
+
+        /* ================= PICK'EM СТИЛИ ================= */
+        .pickem-closed-box { text-align: center; padding: 60px 20px; background: var(--bg-card); border-radius: 8px; border: 1px dashed var(--border); max-width: 600px; margin: 40px auto; }
+        .pickem-closed-box h2 { color: var(--text-muted); margin-bottom: 10px; font-size: 22px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        .pickem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
+        .pickem-card { background: rgba(35, 41, 50, 0.85); border: 1px solid var(--border); padding: 20px; border-radius: 6px; text-align: center; position: relative; cursor: pointer; transition: var(--transition-fast); user-select: none; }
+        .pickem-card:hover { border-color: var(--text-muted); background: rgba(43, 51, 62, 0.9); transform: scale(1.02); }
+        
+        /* Состояние выбранного пикема (в стиле CS2) */
+        .pickem-card.selected { border-color: var(--accent); background: linear-gradient(135deg, rgba(229,169,59,0.05) 0%, rgba(35,41,50,0.9) 100%); box-shadow: inset 0 0 15px rgba(229,169,59,0.15), 0 4px 12px rgba(0,0,0,0.3); }
+        .pickem-card.selected::before { content: '✔'; position: absolute; top: 8px; right: 12px; color: var(--accent); font-weight: bold; font-size: 14px; }
+        
+        .pickem-card-num { font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        .pickem-card-name { font-size: 16px; font-weight: bold; color: var(--text-main); }
+        .pickem-card.empty .pickem-card-name { color: var(--border); font-style: italic; font-weight: normal; }
+
+        /* Админ-инпуты для пикемов */
+        .admin-pickem-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 5px; margin-top: 15px; border: 1px solid var(--border); padding: 15px; border-radius: 4px; background: var(--bg-main); }
+        .admin-pickem-inputs input { width: 100%; min-width: auto; padding: 6px 10px; font-size: 14px; }
     </style>
 </head>
 <body>
+
+<div class="bg-watermark"></div>
 
 <header>
     <div class="logo">AEL <span>top teams</span></div>
     <nav>
         <button id="tab-teams" class="active" onclick="switchTab('teams')">Рейтинг команд</button>
         <button id="tab-tourneys" onclick="switchTab('tourneys')">Турниры</button>
+        <button id="tab-pickem" onclick="switchTab('pickem')">Pick'Em</button>
     </nav>
     <button class="admin-trigger" onclick="toggleAdminMode()">Войти как Админ</button>
 </header>
@@ -114,8 +188,9 @@
             <p><strong>Добавить / Изменить команду:</strong></p>
             <div class="form-group">
                 <input type="text" id="teamName" placeholder="Название команды">
-                <input type="number" id="teamPoints" placeholder="Баллы (очки)">
+                <input type="number" id="teamPoints" placeholder="Очки (баллы)">
                 <input type="text" id="teamLogoUrl" placeholder="Ссылка на URL аватарки команды">
+                <input type="text" id="teamWinnerOf" placeholder="Победитель какого турнира (оставьте пустым, если нет)">
                 <input type="text" id="teamPlayers" placeholder="Игроки через запятую (например: s1mple, b1t, jL)">
                 <button class="btn" onclick="saveTeam()">Сохранить команду</button>
             </div>
@@ -134,10 +209,35 @@
                 <button class="btn" onclick="saveTournament()">Добавить турнир</button>
             </div>
         </div>
+
+        <!-- Управление Pick'Em -->
+        <div id="admin-pickem-section" class="hidden">
+            <p><strong>Настройки Pick'Em турнира:</strong></p>
+            <div class="form-group" style="margin-top:10px;">
+                <label>Доступность для гостей: </label>
+                <select id="pickemStateSelect" onchange="changePickemState()">
+                    <option value="closed">🔒 Закрыт (Временно недоступен)</option>
+                    <option value="open">🔓 Открыт (Гости делают прогнозы)</option>
+                </select>
+                
+                <label style="margin-left: 15px;">Размер сетки: </label>
+                <select id="pickemSizeSelect" onchange="changePickemSize()">
+                    <option value="32">32 команды</option>
+                    <option value="16" selected>16 команд</option>
+                    <option value="8">8 команд</option>
+                </select>
+            </div>
+            
+            <p style="margin-top:15px;"><strong>Заполните названия команд для слотов Pick'Em:</strong></p>
+            <div class="admin-pickem-inputs" id="adminPickemInputsContainer">
+                <!-- Сюда скрипт выведет поля для ввода текста -->
+            </div>
+            <button class="btn" style="margin-top:15px;" onclick="savePickemTeams()">Сохранить сетку Pick'Em</button>
+        </div>
     </div>
 
     <!-- ВКЛАДКА: КОМАНДЫ -->
-    <div id="page-teams">
+    <div id="page-teams" class="page-fade">
         <table class="ranking-table">
             <thead>
                 <tr>
@@ -145,51 +245,87 @@
                     <th class="col-team">Команда</th>
                     <th class="col-points">Баллы</th>
                     <th class="col-reactions">Мнение гостей</th>
-                    <th class="col-actions admin-only hidden">Действия</th>
+                    <th class="col-actions admin-only hidden">Действия админа</th>
                 </tr>
             </thead>
             <tbody id="teamsTableBody">
-                <!-- Данные загружаются скриптом -->
+                <!-- Данные подгружаются скриптом -->
             </tbody>
         </table>
     </div>
 
     <!-- ВКЛАДКА: ТУРНИРЫ -->
-    <div id="page-tourneys" class="hidden">
+    <div id="page-tourneys" class="hidden page-fade">
         <div class="tournaments-grid" id="tournamentsGrid">
-            <!-- Данные загружаются скриптом -->
+            <!-- Данные подгружаются скриптом -->
+        </div>
+    </div>
+
+    <!-- ВКЛАДКА: PICK'EM -->
+    <div id="page-pickem" class="hidden page-fade">
+        <!-- Блок, если пикем закрыт -->
+        <div id="pickemClosedMessage" class="pickem-closed-box hidden">
+            <h2>🔒 Pick'Em временно закрыт</h2>
+            <p style="color: var(--text-muted);">Прием прогнозов приостановлен или стадия турнира еще не началась. Следите за официальными анонсами!</p>
+        </div>
+
+        <!-- Интерфейс пикема, если он открыт -->
+        <div id="pickemActiveContent" class="hidden">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h2 style="color: var(--accent); letter-spacing: 1px;">MAKE YOUR PREDICTIONS</h2>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Нажмите на карточки команд, чтобы выбрать тех, кто по вашему мнению пройдет дальше.</p>
+            </div>
+            <div class="pickem-grid" id="pickemGrid">
+                <!-- Карточки генерируются скриптом -->
+            </div>
         </div>
     </div>
 
 </div>
 
 <script>
-    // Загрузка данных из LocalStorage, либо дефолтные, если память пуста
+    // Базовые данные
     let defaultTeams = [
-        { id: 1, name: "Natus Vincere", points: 1000, logo: "https://img-cdn.hltv.org/teamlogo/9v6S8p0p7OQ4zWJcW8u5_O.svg?ixlib=java-2.1.0&s=7c1b500fa2066fa9d0bc650ee0e94bb7", players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"], likes: 15, dislikes: 2 },
-        { id: 2, name: "FaZe Clan", points: 850, logo: "", players: ["karrigan", "NiKo", "ropz", "broky", "rain"], likes: 8, dislikes: 4 },
-        { id: 3, name: "Team Spirit", points: 920, logo: "", players: ["shalfey", "chopper", "magixx", "donk", "zoner"], likes: 23, dislikes: 1 }
+        { id: 1, name: "Natus Vincere", points: 1000, logo: "https://img-cdn.hltv.org/teamlogo/9v6S8p0p7OQ4zWJcW8u5_O.svg?ixlib=java-2.1.0&s=7c1b500fa2066fa9d0bc650ee0e94bb7", players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"], likes: 15, dislikes: 2, tournamentStatus: "in_game", winnerOf: "AEL Masters 2026" },
+        { id: 2, name: "FaZe Clan", points: 850, logo: "", players: ["karrigan", "NiKo", "ropz", "broky", "rain"], likes: 8, dislikes: 4, tournamentStatus: "out", winnerOf: "" },
+        { id: 3, name: "Team Spirit", points: 920, logo: "", players: ["shalfey", "chopper", "magixx", "donk", "zoner"], likes: 23, dislikes: 1, tournamentStatus: "none", winnerOf: "" }
     ];
 
     let defaultTournaments = [
-        { id: 1, name: "AEL Masters 2026", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500", status: "active" },
-        { id: 2, name: "AEL Spring Cup", img: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=500", status: "inactive" }
+        { id: 1, name: "AEL Masters 2026", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500", status: "active" }
     ];
+
+    // Дефолтные настройки Pick'Em
+    let defaultPickemConfig = {
+        state: "closed", // или "open"
+        size: 16,
+        teams: Array(16).fill("")
+    };
 
     let teams = JSON.parse(localStorage.getItem('ael_teams')) || defaultTeams;
     let tournaments = JSON.parse(localStorage.getItem('ael_tournaments')) || defaultTournaments;
+    let votedTeams = JSON.parse(localStorage.getItem('ael_voted_teams')) || [];
+    
+    // Загрузка Pick'Em из памяти
+    let pickemConfig = JSON.parse(localStorage.getItem('ael_pickem_config')) || defaultPickemConfig;
+    // Личные сохраненные прогнозы пользователя на устройстве
+    let userPickemChoices = JSON.parse(localStorage.getItem('ael_user_pickem')) || [];
 
     let isAdmin = false;
     let editingTeamId = null;
 
-    // Инициализация при загрузке
     saveToStorage();
     renderTeams();
     renderTournaments();
+    initPickemAdminInputs();
+    renderPickemGrid();
 
     function saveToStorage() {
         localStorage.setItem('ael_teams', JSON.stringify(teams));
         localStorage.setItem('ael_tournaments', JSON.stringify(tournaments));
+        localStorage.setItem('ael_voted_teams', JSON.stringify(votedTeams));
+        localStorage.setItem('ael_pickem_config', JSON.stringify(pickemConfig));
+        localStorage.setItem('ael_user_pickem', JSON.stringify(userPickemChoices));
     }
 
     function toggleAdminMode() {
@@ -199,6 +335,12 @@
                 isAdmin = true;
                 document.getElementById('adminPanel').style.display = 'block';
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                
+                // Ставим значения конфига в форму управления пикемом
+                document.getElementById('pickemStateSelect').value = pickemConfig.state;
+                document.getElementById('pickemSizeSelect').value = pickemConfig.size;
+                initPickemAdminInputs();
+
                 alert("Вы вошли как администратор!");
                 renderTeams();
             } else {
@@ -215,34 +357,56 @@
     function switchTab(tab) {
         document.getElementById('tab-teams').classList.remove('active');
         document.getElementById('tab-tourneys').classList.remove('active');
+        document.getElementById('tab-pickem').classList.remove('active');
+        
         document.getElementById('page-teams').classList.add('hidden');
         document.getElementById('page-tourneys').classList.add('hidden');
+        document.getElementById('page-pickem').classList.add('hidden');
+        
         document.getElementById('admin-teams-section').classList.add('hidden');
         document.getElementById('admin-tourneys-section').classList.add('hidden');
+        document.getElementById('admin-pickem-section').classList.add('hidden');
 
         if (tab === 'teams') {
             document.getElementById('tab-teams').classList.add('active');
             document.getElementById('page-teams').classList.remove('hidden');
             document.getElementById('admin-teams-section').classList.remove('hidden');
-        } else {
+        } else if (tab === 'tourneys') {
             document.getElementById('tab-tourneys').classList.add('active');
             document.getElementById('page-tourneys').classList.remove('hidden');
             document.getElementById('admin-tourneys-section').classList.remove('hidden');
+        } else if (tab === 'pickem') {
+            document.getElementById('tab-pickem').classList.add('active');
+            document.getElementById('page-pickem').classList.remove('hidden');
+            document.getElementById('admin-pickem-section').classList.remove('hidden');
+            renderPickemGrid();
         }
     }
 
-    // Рендеринг таблицы команд (с автосортировкой по баллам)
     function renderTeams() {
         teams.sort((a, b) => b.points - a.points);
-        
         const tbody = document.getElementById('teamsTableBody');
         tbody.innerHTML = '';
 
         teams.forEach((team, index) => {
-            // Проверка аватарки
             let logoHtml = team.logo 
                 ? `<img class="team-logo" src="${team.logo}" alt="${team.name}">`
                 : `<div class="team-logo-placeholder">${team.name.charAt(0)}</div>`;
+
+            let statusTagHtml = '';
+            if (team.tournamentStatus === 'in_game') {
+                statusTagHtml = `<span class="status-tag in_game">Участвует</span>`;
+            } else if (team.tournamentStatus === 'out') {
+                statusTagHtml = `<span class="status-tag out">Вылетел</span>`;
+            }
+
+            let winnerHtml = '';
+            if (team.winnerOf && team.winnerOf.trim() !== "") {
+                winnerHtml = `<div class="winner-tag">🏆 Победитель ${team.winnerOf}</div>`;
+            }
+
+            const hasVoted = votedTeams.includes(team.id);
+            const reactedClass = hasVoted ? 'btn-reacted' : '';
 
             const tr = document.createElement('tr');
             tr.className = 'team-row';
@@ -251,24 +415,31 @@
                 <td class="col-team" onclick="togglePlayers(${team.id})">
                     <div class="team-info-cell">
                         ${logoHtml}
-                        <span>${team.name}</span>
+                        <div class="team-name-block">
+                            <div><span style="font-size: 18px;">${team.name}</span> ${statusTagHtml}</div>
+                            ${winnerHtml}
+                        </div>
                     </div>
                 </td>
-                <td class="col-points" onclick="togglePlayers(${team.id})">${team.points} <span style="font-size:11px;color:var(--text-muted)">pts</span></td>
+                <td class="col-points" onclick="togglePlayers(${team.id})">${team.points}<span>очки</span></td>
                 <td class="col-reactions">
                     <div class="reaction-buttons">
-                        <button class="btn-like" onclick="likeTeam(${team.id}, event)">👍 <span>${team.likes || 0}</span></button>
-                        <button class="btn-dislike" onclick="likeTeam(${team.id}, event, false)">👎 <span>${team.dislikes || 0}</span></button>
+                        <button class="btn-like ${reactedClass}" onclick="likeTeam(${team.id}, event, true)">👍 <span>${team.likes || 0}</span></button>
+                        <button class="btn-dislike ${reactedClass}" onclick="likeTeam(${team.id}, event, false)">👎 <span>${team.dislikes || 0}</span></button>
                     </div>
                 </td>
                 <td class="col-actions admin-only ${isAdmin ? '' : 'hidden'}">
-                    <button onclick="editTeam(${team.id})" style="background:none; border:none; color:var(--accent); cursor:pointer; margin-right:10px;">✏️</button>
-                    <button onclick="deleteTeam(${team.id})" style="background:none; border:none; color:var(--inactive-red); cursor:pointer;">❌</button>
+                    <div class="status-admin-btns">
+                        <button class="btn-status btn-in" onclick="changeTeamTourneyStatus(${team.id}, 'in_game', event)">Участвует</button>
+                        <button class="btn-status btn-out" onclick="changeTeamTourneyStatus(${team.id}, 'out', event)">Вылетел</button>
+                        <button class="btn-status btn-reset" onclick="changeTeamTourneyStatus(${team.id}, 'none', event)">Сброс</button>
+                    </div>
+                    <button onclick="editTeam(${team.id}, event)" style="background:none; border:none; color:var(--accent); cursor:pointer; margin-right:15px; font-size:16px;">✏️ Редактировать</button>
+                    <button onclick="deleteTeam(${team.id}, event)" style="background:none; border:none; color:var(--inactive-red); cursor:pointer; font-size:16px;">❌ Удалить</button>
                 </td>
             `;
             tbody.appendChild(tr);
 
-            // Скрытая строка с игроками
             const playersTr = document.createElement('tr');
             playersTr.id = `players-${team.id}`;
             playersTr.className = 'players-row';
@@ -293,24 +464,36 @@
         row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
     }
 
-    // Гостевые лайки / дизлайки
+    function changeTeamTourneyStatus(id, status, event) {
+        event.stopPropagation();
+        const team = teams.find(t => t.id === id);
+        team.tournamentStatus = status;
+        saveToStorage();
+        renderTeams();
+    }
+
     function likeTeam(id, event, isLike = true) {
-        event.stopPropagation(); // Чтобы не раскрывался список игроков при клике на лайк
+        event.stopPropagation();
+        if (votedTeams.includes(id)) {
+            alert("Вы уже оставили своё мнение об этой команде!");
+            return;
+        }
         const team = teams.find(t => t.id === id);
         if (isLike) {
             team.likes = (team.likes || 0) + 1;
         } else {
             team.dislikes = (team.dislikes || 0) + 1;
         }
+        votedTeams.push(id);
         saveToStorage();
         renderTeams();
     }
 
-    // Функции админки для Команд
     function saveTeam() {
         const name = document.getElementById('teamName').value.trim();
         const points = parseInt(document.getElementById('teamPoints').value) || 0;
         const logo = document.getElementById('teamLogoUrl').value.trim();
+        const winnerOf = document.getElementById('teamWinnerOf').value.trim();
         const playersString = document.getElementById('teamPlayers').value;
         const players = playersString ? playersString.split(',').map(p => p.trim()) : [];
 
@@ -321,51 +504,53 @@
             team.name = name;
             team.points = points;
             team.logo = logo;
+            team.winnerOf = winnerOf;
             team.players = players;
             editingTeamId = null;
         } else {
-            teams.push({ id: Date.now(), name, points, logo, players, likes: 0, dislikes: 0 });
+            teams.push({ id: Date.now(), name, points, logo, winnerOf, players, likes: 0, dislikes: 0, tournamentStatus: 'none' });
         }
 
         document.getElementById('teamName').value = '';
         document.getElementById('teamPoints').value = '';
         document.getElementById('teamLogoUrl').value = '';
+        document.getElementById('teamWinnerOf').value = '';
         document.getElementById('teamPlayers').value = '';
         
         saveToStorage();
         renderTeams();
     }
 
-    function editTeam(id) {
+    function editTeam(id, event) {
+        event.stopPropagation();
         const team = teams.find(t => t.id === id);
         document.getElementById('teamName').value = team.name;
         document.getElementById('teamPoints').value = team.points;
         document.getElementById('teamLogoUrl').value = team.logo || '';
+        document.getElementById('teamWinnerOf').value = team.winnerOf || '';
         document.getElementById('teamPlayers').value = team.players.join(', ');
         editingTeamId = id;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function deleteTeam(id) {
+    function deleteTeam(id, event) {
+        event.stopPropagation();
         if(confirm("Удалить эту команду?")) {
             teams = teams.filter(t => t.id !== id);
+            votedTeams = votedTeams.filter(vId => vId !== id);
             saveToStorage();
             renderTeams();
         }
     }
 
-    // Рендеринг Турниров
     function renderTournaments() {
         const grid = document.getElementById('tournamentsGrid');
         grid.innerHTML = '';
-
         tournaments.forEach(t => {
             const card = document.createElement('div');
             card.className = 'tournament-card';
-            
             const badgeClass = t.status === 'active' ? 'active' : 'inactive';
             const badgeText = t.status === 'active' ? 'Активно' : 'Неактивно';
-
             card.innerHTML = `
                 <div class="tournament-img" style="background-image: url('${t.img || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500'}')"></div>
                 <span class="status-badge ${badgeClass}">${badgeText}</span>
@@ -385,14 +570,10 @@
         const name = document.getElementById('tourneyName').value.trim();
         const img = document.getElementById('tourneyImg').value.trim();
         const status = document.getElementById('tourneyStatus').value;
-
         if (!name) return alert('Введите название турнира!');
-
         tournaments.push({ id: Date.now(), name, img, status });
-        
         document.getElementById('tourneyName').value = '';
         document.getElementById('tourneyImg').value = '';
-        
         saveToStorage();
         renderTournaments();
     }
@@ -410,6 +591,122 @@
             saveToStorage();
             renderTournaments();
         }
+    }
+
+
+    /* ================= ЛОГИКА ДЛЯ ВKЛАДКИ PICK'EM ================= */
+
+    // Инициализация полей ввода команд в админке
+    function initPickemAdminInputs() {
+        const container = document.getElementById('adminPickemInputsContainer');
+        container.innerHTML = '';
+        const size = pickemConfig.size;
+
+        for (let i = 0; i < size; i++) {
+            const currentVal = pickemConfig.teams[i] || "";
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = `pk-input-${i}`;
+            input.placeholder = `Команда #${i + 1}`;
+            input.value = currentVal;
+            container.appendChild(input);
+        }
+    }
+
+    // Смена статуса (Открыт / Закрыт)
+    function changePickemState() {
+        pickemConfig.state = document.getElementById('pickemStateSelect').value;
+        saveToStorage();
+        renderPickemGrid();
+    }
+
+    // Смена размера сетки (32, 16, 8)
+    function changePickemSize() {
+        const newSize = parseInt(document.getElementById('pickemSizeSelect').value);
+        pickemConfig.size = newSize;
+        
+        // Подгоняем массив названий команд под новый размер
+        let newTeamsArray = [];
+        for (let i = 0; i < newSize; i++) {
+            newTeamsArray.push(pickemConfig.teams[i] || "");
+        }
+        pickemConfig.teams = newTeamsArray;
+        
+        // Сбрасываем прогнозы пользователей, если сетка уменьшилась кардинально, во избежание багов
+        userPickemChoices = [];
+        
+        saveToStorage();
+        initPickemAdminInputs();
+        renderPickemGrid();
+    }
+
+    // Сохранение введенных админом названий команд
+    function savePickemTeams() {
+        const size = pickemConfig.size;
+        for (let i = 0; i < size; i++) {
+            pickemConfig.teams[i] = document.getElementById(`pk-input-${i}`).value.trim();
+        }
+        saveToStorage();
+        renderPickemGrid();
+        alert("Сетка Pick'Em успешно сохранена!");
+    }
+
+    // Отрисовка сетки прогнозов для пользователей
+    function renderPickemGrid() {
+        const closedBox = document.getElementById('pickemClosedMessage');
+        const activeContent = document.getElementById('pickemActiveContent');
+        const grid = document.getElementById('pickemGrid');
+        
+        grid.innerHTML = '';
+
+        // Если закрыт и пользователь НЕ админ — прячем и пишем заглушку
+        if (pickemConfig.state === 'closed' && !isAdmin) {
+            closedBox.classList.remove('hidden');
+            activeContent.classList.add('hidden');
+            return;
+        }
+
+        // В противном случае показываем сетку
+        closedBox.classList.add('hidden');
+        activeContent.classList.remove('hidden');
+
+        pickemConfig.teams.forEach((teamName, index) => {
+            const card = document.createElement('div');
+            const isEmpty = !teamName;
+            
+            card.className = `pickem-card ${isEmpty ? 'empty' : ''}`;
+            
+            // Если гость уже кликал на эту карточку, подсвечиваем её
+            if (userPickemChoices.includes(index) && !isEmpty) {
+                card.classList.add('selected');
+            }
+
+            card.innerHTML = `
+                <span class="pickem-card-num">Слот #${index + 1}</span>
+                <div class="pickem-card-name">${teamName || 'Команда не назначена'}</div>
+            `;
+
+            // Обработчик клика для выбора прогноза
+            if (!isEmpty) {
+                card.onclick = () => togglePickemChoice(index);
+            }
+
+            grid.appendChild(card);
+        });
+    }
+
+    // Клик пользователя по карточке в Pick'Em
+    function togglePickemChoice(index) {
+        // Если админ просто тестирует или гость делает выбор
+        if (userPickemChoices.includes(index)) {
+            // Удаляем из выбранных
+            userPickemChoices = userPickemChoices.filter(i => i !== index);
+        } else {
+            // Добавляем в выбранные
+            userPickemChoices.push(index);
+        }
+        saveToStorage();
+        renderPickemGrid();
     }
 </script>
 </body>
