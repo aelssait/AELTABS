@@ -463,17 +463,41 @@
     renderTournaments();
 
 
+const SERVER_URL = 'https://onrender.com';
 
-    function saveToStorage() {
+function loadFromServer() {
+    fetch(${SERVER_URL}/get-teams)
+        .then(res => res.json())
+        .then(data => {
+            if (data && typeof data === 'object' && !Array.isArray(data)) {
+                // Если на сервере есть сохраненные данные, обновляем массивы в коде
+                if (data.teams) teams = data.teams;
+                if (data.tournaments) tournaments = data.tournaments;
+                if (data.votedTeams) votedTeams = data.votedTeams;
+                
+                // Перерисовываем интерфейс сайта для пользователей
+                if (typeof renderTeams === 'function') renderTeams();
+                if (typeof renderTournaments === 'function') renderTournaments();
+            }
+        })
+        .catch(err => console.error("Ошибка загрузки:", err));
+}
 
-        localStorage.setItem('ael_teams', JSON.stringify(teams));
+function saveToStorage() {
+    // Собираем все три массива в один объект
+    const allData = {
+        teams: typeof teams !== 'undefined' ? teams : [],
+        tournaments: typeof tournaments !== 'undefined' ? tournaments : [],
+        votedTeams: typeof votedTeams !== 'undefined' ? votedTeams : []
+    };
 
-        localStorage.setItem('ael_tournaments', JSON.stringify(tournaments));
-
-        localStorage.setItem('ael_voted_teams', JSON.stringify(votedTeams));
-
-    }
-
+    fetch(${SERVER_URL}/save-teams, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(allData)
+    })
+    .catch(err => console.error("Ошибка сохранения:", err));
+}
 
 
     function toggleAdminMode() {
@@ -1003,7 +1027,8 @@
         }
 
     }
-
+loadFromServer();
+setInterval(loadFromServer, 3000);
 </script>
 
 </body>
