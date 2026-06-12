@@ -18,11 +18,10 @@
             --active-green: #22c55e;
             --inactive-red: #ef4444;
             --border: #262c35;
-            --transition-smooth: all 0.25s ease;
-            --neon-shadow: none;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 💎 СЕКРЕТНОЕ НЕОНОВОЕ ОФОРМЛЕНИЕ ЗА ИДЕАЛЬНЫЙ ПИKEM 💎 */
+        /* 💎 СЕКРЕТНОЕ НЕОНОВОЕ ОФОРМЛЕНИЕ С ТЕКСТОВЫМ ФОНОМ 💎 */
         body.perfect-pickem-unlocked {
             --bg-main: #0a0b10;
             --bg-card: #121420;
@@ -30,23 +29,52 @@
             --accent: #00ffcc;
             --accent-hover: #33ffdd;
             --border: #1f3d44;
-            --neon-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
+            background: linear-gradient(135deg, #0a0b10 0%, #121026 50%, #05060b 100%);
+            background-size: 400% 400%;
+            animation: gradientBg 15s ease infinite;
+            position: relative;
+            overflow-x: hidden;
         }
+
+        /* Полупрозрачный водяной знак на весь фон */
+        body.perfect-pickem-unlocked::before {
+            content: "MASTER PICKEM MASTER PICKEM MASTER PICKEM MASTER PICKEM";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 8vw;
+            font-weight: 900;
+            color: rgba(0, 255, 204, 0.03);
+            white-space: nowrap;
+            letter-spacing: 10px;
+            z-index: -1;
+            pointer-events: none;
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.05);
+        }
+        
+        @keyframes gradientBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         body.perfect-pickem-unlocked .logo span {
-            text-shadow: 0 0 15px rgba(0, 255, 204, 0.8);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.6), 0 0 20px rgba(0, 255, 204, 0.4);
             animation: pulseNeon 2s infinite alternate;
         }
+        
         @keyframes pulseNeon {
-            from { text-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
-            to { text-shadow: 0 0 25px rgba(0, 255, 204, 0.9); }
+            from { text-shadow: 0 0 8px rgba(0, 255, 204, 0.5); }
+            to { text-shadow: 0 0 20px rgba(0, 255, 204, 1), 0 0 30px rgba(0, 191, 255, 0.6); }
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 60px; transition: var(--transition-smooth); }
 
-        header { background-color: var(--bg-header); border-bottom: 2px solid var(--accent); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        header { background-color: var(--bg-header); border-bottom: 2px solid var(--accent); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; transition: var(--transition-smooth); }
         .logo { font-size: 24px; font-weight: bold; }
-        .logo span { color: var(--accent); }
+        .logo span { color: var(--accent); transition: var(--transition-smooth); }
         
         nav { display: flex; gap: 5px; }
         nav button { background: none; border: none; color: var(--text-main); font-size: 15px; font-weight: 500; cursor: pointer; padding: 10px 16px; transition: var(--transition-smooth); border-radius: 4px; }
@@ -56,85 +84,87 @@
         .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         .hidden { display: none !important; }
 
-        .admin-trigger { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 15px; border-radius: 4px; cursor: pointer; }
-        .admin-panel { background: var(--bg-card); border: 1px solid var(--accent); padding: 20px; border-radius: 6px; margin-bottom: 25px; display: none; }
-        .admin-panel h3 { color: var(--accent); margin-bottom: 15px; }
+        .admin-trigger { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 15px; border-radius: 4px; cursor: pointer; transition: var(--transition-smooth); }
+        .admin-trigger.active { border-color: var(--inactive-red); color: #fff; }
+        
+        /* Стили блоков админки */
+        .admin-section-block { background: var(--bg-card); border: 1px solid var(--accent); padding: 20px; border-radius: 6px; margin-bottom: 25px; animation: fadeIn 0.3s ease; }
+        .admin-section-block h3 { color: var(--accent); margin-bottom: 15px; }
 
-        button.btn { background: var(--accent); color: var(--bg-header); border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 12px; }
-        button.btn:disabled { background: var(--border) !important; color: var(--text-muted) !important; cursor: not-allowed; }
+        button.btn { background: var(--accent); color: var(--bg-header); border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: var(--transition-smooth); }
+        button.btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        
+        .btn-status { padding: 4px 8px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-status.active-status { background: var(--active-green); color: #fff; }
+        .btn-status.eliminated-status { background: var(--inactive-red); color: #fff; }
 
         .form-inline { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
         .form-inline input, .form-inline select { background: var(--bg-main); border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 4px; }
 
-        /* ================= ТАБЛИЦА СТАНДАРТНОГО РЕЙТИНГА И ИГРОКИ ================= */
+        /* Фильтры рейтинга */
+        .filter-controls { margin-bottom: 15px; display: flex; gap: 10px; }
+        .filter-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .filter-btn.active { border-color: var(--accent); color: var(--accent); }
+
+        /* ================= ТАБЛИЦА РЕЙТИНГА ================= */
         .ranking-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
         .ranking-table th { color: var(--text-muted); text-align: left; padding: 10px 20px; font-size: 13px; text-transform: uppercase; }
-        .ranking-table td { background: var(--bg-card); padding: 18px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition-smooth); }
+        .ranking-table td { background: var(--bg-card); padding: 15px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition-smooth); }
         
         .ranking-table td:first-child { border-left: 1px solid var(--border); border-top-left-radius: 6px; border-bottom-left-radius: 6px; width: 70px; text-align: center; font-size: 18px; font-weight: bold; }
         .ranking-table td:last-child { border-right: 1px solid var(--border); border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
         
-        /* Рамки 1, 2, 3 места */
+        .ranking-table tr.team-row:hover td { background: rgba(255, 255, 255, 0.02); border-color: var(--text-muted); }
+        .ranking-table tr.eliminated td { opacity: 0.4; }
+
+        .team-info-cell { display: flex; align-items: center; gap: 12px; }
+        .team-logo { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; background: #262c35; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+        /* Топ рамки */
         .ranking-table tr.top-1 td { border-top-color: var(--accent) !important; border-bottom-color: var(--accent) !important; }
         .ranking-table tr.top-1 td:first-child { border-left-color: var(--accent) !important; }
         .ranking-table tr.top-1 td:last-child { border-right-color: var(--accent) !important; }
 
-        .ranking-table tr.top-2 td { border-top-color: var(--silver) !important; border-bottom-color: var(--silver) !important; }
-        .ranking-table tr.top-2 td:first-child { border-left-color: var(--silver) !important; }
-        .ranking-table tr.top-2 td:last-child { border-right-color: var(--silver) !important; }
-
-        .ranking-table tr.top-3 td { border-top-color: var(--bronze) !important; border-bottom-color: var(--bronze) !important; }
-        .ranking-table tr.top-3 td:first-child { border-left-color: var(--bronze) !important; }
-        .ranking-table tr.top-3 td:last-child { border-right-color: var(--bronze) !important; }
-
         .col-points { text-align: right; font-weight: bold; color: var(--accent); font-size: 18px; width: 150px; }
         .col-points span { font-size: 12px; color: var(--text-muted); margin-left: 5px; }
 
-        /* Выпадающий список игроков */
+        /* ПЛАВНОЕ РАСКРЫТИЕ ИГРОКОВ */
         .players-row td { padding: 0 !important; background: none !important; border: none !important; }
+        .players-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .players-wrapper.open { max-height: 200px; }
         .players-box { padding: 15px 20px; background: rgba(18, 21, 26, 0.95); border-radius: 6px; margin-top: -5px; margin-bottom: 10px; border: 1px solid var(--border); border-left: 4px solid var(--accent); }
         .players-list { display: flex; gap: 10px; flex-wrap: wrap; list-style: none; }
         .players-list li { background: var(--bg-main); padding: 6px 14px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border); }
 
-        /* ================= ТУРНИРЫ ================= */
+        /* ТУРНИРЫ */
         .tournaments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
         .tournament-card { background: var(--bg-card); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); position: relative; transition: var(--transition-smooth); }
         .tournament-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .tournament-img { width: 100%; height: 160px; background-size: cover; background-position: center; background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500'); }
+        .tournament-img { height: 140px; background: #262c35; display: flex; align-items: center; justify-content: center; font-size: 40px; }
         .tournament-info { padding: 15px; }
         .status-badge { position: absolute; top: 10px; right: 10px; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; }
-        .status-badge.active { background: var(--active-green); color: #fff; }
-        .status-badge.inactive { background: var(--inactive-red); color: #fff; }
+        .status-badge.active { background: var(--active-green); }
+        .status-badge.inactive { background: var(--inactive-red); }
 
-        /* ================= СЕТКА PICK'EM ================= */
-        .pickem-controls { display: flex; justify-content: space-between; align-items: center; background: var(--bg-header); padding: 15px; border-radius: 6px; margin-bottom: 20px; }
-        .bracket-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: start; margin-top: 20px; overflow-x: auto; padding-bottom: 20px; }
+        /* PICK'EM СЕТКА */
+        .bracket-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; overflow-x: auto; }
         .bracket-column { background: rgba(28, 32, 38, 0.4); padding: 15px; border-radius: 6px; border: 1px solid var(--border); min-width: 250px; }
-        .bracket-column h4 { text-align: center; margin-bottom: 15px; color: var(--text-muted); font-size: 13px; text-transform: uppercase; }
-        
+        .bracket-column h4 { text-align: center; margin-bottom: 15px; color: var(--text-muted); font-size: 13px; }
         .match-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 15px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-        .match-title { font-size: 11px; color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 4px; }
-
-        .pick-team-btn { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; text-align: left; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; transition: var(--transition-smooth); }
-        .pick-team-btn:hover { border-color: var(--accent); }
+        .pick-team-btn { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; text-align: left; border-radius: 4px; cursor: pointer; width: 100%; transition: var(--transition-smooth); }
         .pick-team-btn.voted { border-color: var(--accent); background: rgba(229, 169, 59, 0.1); font-weight: bold; }
         body.perfect-pickem-unlocked .pick-team-btn.voted { border-color: var(--accent); background: rgba(0, 255, 204, 0.1); }
+        .pick-team-btn.result-winner { border-color: var(--active-green) !important; background: rgba(34, 197, 94, 0.15) !important; }
+        .pick-team-btn.result-loser { border-color: var(--inactive-red) !important; opacity: 0.5; }
 
-        .pick-team-btn.result-winner { border-color: var(--active-green) !important; background: rgba(34, 197, 94, 0.15) !important; position: relative; }
-        .pick-team-btn.result-winner::after { content: '🏆'; position: absolute; right: 10px; }
-        .pick-team-btn.result-loser { border-color: var(--inactive-red) !important; background: rgba(239, 68, 68, 0.1) !important; opacity: 0.6; }
+        /* АДМИН ПАНЕЛИ ДЛЯ ДРАГ-Н-ДРОП */
+        .admin-drag-section { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 15px; }
+        .drag-pool { background: var(--bg-main); border: 1px dashed var(--border); padding: 15px; border-radius: 6px; max-height: 300px; overflow-y: auto; }
+        .drag-item { background: var(--bg-card); border: 1px solid var(--border); padding: 8px 12px; margin-bottom: 8px; border-radius: 4px; cursor: grab; }
+        .drop-zone { background: rgba(255,255,255,0.02); border: 2px dashed var(--border); min-height: 40px; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; color: var(--text-muted); margin: 4px 0; }
 
-        /* АДМИН ДРАГ-Н-ДРОП */
-        .admin-drag-section { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); }
-        .drag-pool { background: var(--bg-main); border: 1px dashed var(--border); padding: 15px; border-radius: 6px; max-height: 400px; overflow-y: auto; }
-        .drag-item { background: var(--bg-card); border: 1px solid var(--border); padding: 8px 12px; margin-bottom: 8px; border-radius: 4px; cursor: grab; font-size: 14px; }
-        
-        .admin-slots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .admin-match-slot { background: var(--bg-main); border: 1px solid var(--border); padding: 10px; border-radius: 6px; }
-        .drop-zone { background: rgba(255,255,255,0.02); border: 2px dashed var(--border); min-height: 42px; border-radius: 4px; display: flex; align-items: center; padding: 0 10px; color: var(--text-muted); font-size: 13px; margin: 4px 0; }
-        .drop-zone.hover { border-color: var(--accent); background: rgba(229,169,59,0.05); }
-
-        .reward-banner { background: linear-gradient(90deg, #00ffcc 0%, #00bcff 100%); color: #05060b; padding: 15px 20px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; box-shadow: var(--neon-shadow); }
+        .reward-banner { background: linear-gradient(90deg, #00ffcc 0%, #00bcff 100%); color: #05060b; padding: 15px 20px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -146,56 +176,80 @@
         <button id="tab-tourneys" onclick="switchTab('tourneys')">Турниры</button>
         <button id="tab-pickem" onclick="switchTab('pickem')">Pick'Em Сетка</button>
     </nav>
-    <button class="admin-trigger" onclick="toggleAdminMode()">Войти как Админ</button>
+    <button id="adminBtn" class="admin-trigger" onclick="toggleAdminMode()">Войти как Админ</button>
 </header>
 
 <div class="container">
 
     <!-- Секретный баннер -->
     <div id="rewardBanner" class="reward-banner hidden">
-        🎉 Поздравляем! Вы безошибочно угадали все исходы матчей Stage 1! Разблокирован Неоновый стиль сайта!
+        🎉 УДИВИТЕЛЬНО! Вы угадали абсолютно все исходы! Разблокирован премиум-стиль MASTER PICKEM!
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ -->
-    <div id="adminPanel" class="admin-panel">
-        <h3>Управление Системой AEL (Админ)</h3>
-        
+    <!-- ================= АДМИН-БЛОКИ (РАЗДЕЛЕННЫЕ ПО ВКЛАДКАМ) ================= -->
+    
+    <!-- Админка Рейтинга -->
+    <div id="admin-block-teams" class="admin-section-block hidden">
+        <h3>Управление командами (Админ)</h3>
         <div class="form-inline">
-            <label style="align-self: center;"><strong>Этап Pick'Em:</strong></label>
-            <select id="adminActiveStageSelect" onchange="changeActiveStageByAdmin()">
-                <option value="1">Stage 1 (1/8 финала)</option>
-                <option value="2">Stage 2 (1/4 финала)</option>
-                <option value="3">Stage 3 (1/2 финала)</option>
-                <option value="4">Stage 4 (Финал)</option>
-                <option value="5">Завершено</option>
-            </select>
-            <button class="btn" style="background: var(--active-green); color:#fff;" onclick="commitStageResults()">✔️ Утвердить победителей</button>
-            <button class="btn" style="background: var(--inactive-red); color:#fff;" onclick="resetPickemSystem()">🗑️ Сбросить Pick'Em</button>
+            <input type="text" id="newTeamName" placeholder="Название команды">
+            <input type="text" id="newTeamLogo" placeholder="Эмодзи или URL логотипа">
+            <input type="number" id="newTeamPoints" placeholder="Баллы">
+            <input type="text" id="newTeamPlayers" placeholder="Игроки (через запятую)">
+            <button class="btn" onclick="addNewTeam()">Добавить команду</button>
         </div>
+        <div id="adminTeamsStatusList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px; margin-top:15px;">
+            <!-- Сюда генерируются тумблеры статусов выбывания -->
+        </div>
+    </div>
 
-        <!-- Добавление турниров -->
-        <div class="form-inline" style="margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 15px;">
-            <input type="text" id="tourneyName" placeholder="Название нового турнира">
+    <!-- Админка Турниров -->
+    <div id="admin-block-tourneys" class="admin-section-block hidden">
+        <h3>Управление турнирами (Админ)</h3>
+        <div class="form-inline">
+            <input type="text" id="tourneyName" placeholder="Название турнира">
+            <input type="text" id="tourneyIcon" placeholder="Иконка/Эмодзи турнира">
             <select id="tourneyStatus">
                 <option value="active">Активен</option>
                 <option value="inactive">Завершен</option>
             </select>
-            <button class="btn" onclick="addTournamentByAdmin()">Добавить турнир</button>
+            <button class="btn" onclick="addTournamentByAdmin()">Создать турнир</button>
         </div>
+    </div>
 
-        <!-- Конструктор пар -->
-        <h4 style="margin-top: 15px; color: var(--accent);">⚙️ Конструктор пар текущего этапа</h4>
+    <!-- Админка Пикема -->
+    <div id="admin-block-pickem" class="admin-section-block hidden">
+        <h3>Конструктор сетки Pick'Em (Админ)</h3>
+        <div class="form-inline">
+            <label>Текущая стадия:</label>
+            <select id="adminActiveStageSelect" onchange="changeActiveStageByAdmin()">
+                <option value="1">Stage 1 (1/4 финала)</option>
+                <option value="2">Stage 2 (1/2 финала)</option>
+                <option value="3">Stage 3 (Финал)</option>
+                <option value="4">Завершено</option>
+            </select>
+            <button class="btn" style="background: var(--active-green); color:#fff;" onclick="commitStageResults()">Утвердить победителей стадии</button>
+            <button class="btn" style="background: var(--inactive-red); color:#fff;" onclick="resetPickemSystem()">Сбросить всё</button>
+        </div>
         <div class="admin-drag-section">
             <div class="drag-pool" id="adminDragPool" ondragover="allowDrop(event)" ondrop="handlePoolDrop(event)"></div>
             <div>
-                <div class="admin-slots-grid" id="adminSlotsGrid"></div>
-                <button class="btn" style="margin-top: 15px; width:100%;" onclick="saveAdminCreatedMatches()">💾 Сохранить созданные пары</button>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;" id="adminSlotsGrid"></div>
+                <button class="btn" style="margin-top:10px; width:100%;" onclick="saveAdminCreatedMatches()">Сохранить пары текущего этапа</button>
             </div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА: РЕЙТИНГ (С ИГРОКАМИ) -->
+
+    <!-- ================= ОСНОВНЫЕ СТРАНИЦЫ ПОЛЬЗОВАТЕЛЯ ================= -->
+
+    <!-- ВКЛАДКА: РЕЙТИНГ -->
     <div id="page-teams">
+        <div class="filter-controls">
+            <button id="filter-all" class="filter-btn active" onclick="setTeamFilter('all')">Все команды</button>
+            <button id="filter-active" class="filter-btn" onclick="setTeamFilter('active')">В игре</button>
+            <button id="filter-out" class="filter-btn" onclick="setTeamFilter('out')">Выбыли</button>
+        </div>
         <table class="ranking-table">
             <thead>
                 <tr>
@@ -215,27 +269,22 @@
 
     <!-- ВКЛАДКА: PICK'EM СЕТКА -->
     <div id="page-pickem" class="hidden">
-        <div class="pickem-controls">
-            <div style="font-size: 16px; font-weight: bold;" id="userStageStatusTitle">Текущий этап: Stage 1</div>
-            <button class="btn" id="saveUserPicksBtn" onclick="saveUserPredictions()">🔒 Отправить свой прогноз</button>
+        <div style="display:flex; justify-content:space-between; background:var(--bg-header); padding:15px; border-radius:6px; margin-bottom:20px; align-items:center;">
+            <div id="userStageStatusTitle" style="font-weight:bold;">Стадия 1</div>
+            <button class="btn" id="saveUserPicksBtn" onclick="saveUserPredictions()">Сохранить мой прогноз</button>
         </div>
-
         <div class="bracket-container">
             <div class="bracket-column">
-                <h4>Stage 1 (1/8)</h4>
+                <h4>Stage 1 (1/4)</h4>
                 <div id="bracket-stage-1"></div>
             </div>
             <div class="bracket-column">
-                <h4>Stage 2 (1/4)</h4>
+                <h4>Stage 2 (1/2)</h4>
                 <div id="bracket-stage-2"></div>
             </div>
             <div class="bracket-column">
-                <h4>Stage 3 (1/2)</h4>
+                <h4>Stage 3 (Финал)</h4>
                 <div id="bracket-stage-3"></div>
-            </div>
-            <div class="bracket-column">
-                <h4>Финал</h4>
-                <div id="bracket-stage-4"></div>
             </div>
         </div>
     </div>
@@ -243,54 +292,55 @@
 </div>
 
 <script>
-    // 16 команд с реальными составами для раскрытия списка игроков
-    let defaultTeamsData = [
-        { name: "Natus Vincere", points: 1200, players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"] },
-        { name: "Team Spirit", points: 1100, players: ["donk", "shalfey", "chopper", "magixx", "zoner"] },
-        { name: "FaZe Clan", points: 950, players: ["karrigan", "rain", "ropz", "broky", "frozen"] },
-        { name: "Vitality", points: 910, players: ["ZywOo", "apEX", "Spinx", "FlameZ", "mezii"] },
-        { name: "G2 Esports", points: 880, players: ["Snax", "NiKo", "m0NESY", "hunter", "malbsMd"] },
-        { name: "MOUZ", points: 820, players: ["siuhy", "xertioN", "torzsi", "Jimpphat", "Brollan"] },
-        { name: "Virtus.pro", points: 750, players: ["Jame", "FL1T", "fame", "electroNic", "n0rb3r7"] },
-        { name: "Astralis", points: 710, players: ["dev1ce", "staehr", "br0", "jabbi", "stavn"] },
-        { name: "Team Liquid", points: 640, players: ["Twistzz", "jks", "ultimate", "NAF", "mithR"] },
-        { name: "HEROIC", points: 610, players: ["kyxsan", "TeSeS", "sjuush", "NertZ", "degster"] },
-        { name: "Eternal Fire", points: 590, players: ["XANTARES", "Calyx", "MAJ3R", "Wicadia", "wooxie"] },
-        { name: "FURIA", points: 550, players: ["Fallen", "chelo", "KSCERATO", "yuurih", "skullz"] },
-        { name: "Complexity", points: 520, players: ["JT", "EliGE", "floppy", "hallzerk", "Grim"] },
-        { name: "MIBR", points: 480, players: ["exit", "brnz4n", "saffee", "drop", "insani"] },
-        { name: "BIG", points: 450, players: ["tabseN", "Krimbo", "syrsoN", "JDC", "rigoN"] },
-        { name: "SAW", points: 410, players: ["MUTIRIS", "rmn", "ewjrk", "story", "roman"] }
+    // Изначальная база данных команд (с логотипами и статусом жизнеспособности)
+    let teamsData = JSON.parse(localStorage.getItem('ael_teams_list')) || [
+        { name: "Natus Vincere", points: 1200, logo: "👑", isEliminated: false, players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"] },
+        { name: "Team Spirit", points: 1100, logo: "🐉", isEliminated: false, players: ["donk", "shalfey", "chopper", "magixx", "zoner"] },
+        { name: "FaZe Clan", points: 950, logo: "🖲️", isEliminated: false, players: ["karrigan", "rain", "ropz", "broky", "frozen"] },
+        { name: "Vitality", points: 910, logo: "🐝", isEliminated: false, players: ["ZywOo", "apEX", "Spinx", "FlameZ", "mezii"] },
+        { name: "G2 Esports", points: 880, logo: "🥷", isEliminated: false, players: ["Snax", "NiKo", "m0NESY", "hunter", "malbsMd"] },
+        { name: "MOUZ", points: 820, logo: "🐭", isEliminated: false, players: ["siuhy", "xertioN", "torzsi", "Jimpphat", "Brollan"] },
+        { name: "Virtus.pro", points: 750, logo: "🐻", isEliminated: false, players: ["Jame", "FL1T", "fame", "electroNic", "n0rb3r7"] },
+        { name: "Astralis", points: 710, logo: "⭐", isEliminated: false, players: ["dev1ce", "staehr", "br0", "jabbi", "stavn"] }
     ];
-
-    const initial16Names = defaultTeamsData.map(t => t.name);
 
     let pickemSystem = JSON.parse(localStorage.getItem('ael_bracket_system')) || {
-        activeStage: 1, 
-        allowedTeamsPerStage: { 1: [...initial16Names], 2: [], 3: [], 4: [] },
-        matches: { 1: [], 2: [], 3: [], 4: [] }
+        activeStage: 1,
+        allowedTeamsPerStage: { 1: teamsData.map(t => t.name), 2: [], 3: [] },
+        matches: { 1: [], 2: [], 3: [] }
     };
 
-    let guestPredictions = JSON.parse(localStorage.getItem('ael_guest_predictions')) || { 1: {}, 2: {}, 3: {}, 4: {} };
+    let guestPredictions = JSON.parse(localStorage.getItem('ael_guest_predictions')) || { 1: {}, 2: {}, 3: {} };
+    
     let tournaments = JSON.parse(localStorage.getItem('ael_tournaments')) || [
-        { name: "AEL Masters 2026", status: "active" },
-        { name: "AEL Spring Cup", status: "inactive" }
+        { name: "AEL Masters 2026", icon: "🏆", status: "active" },
+        { name: "AEL Spring Cup", icon: "🌱", status: "inactive" }
     ];
 
+    let currentTab = 'teams';
+    let currentFilter = 'all'; 
     let isAdmin = false;
 
     saveAndSync();
-    renderRatingTable();
-    renderTournaments();
+    renderAll();
 
     function saveAndSync() {
+        localStorage.setItem('ael_teams_list', JSON.stringify(teamsData));
         localStorage.setItem('ael_bracket_system', JSON.stringify(pickemSystem));
         localStorage.setItem('ael_guest_predictions', JSON.stringify(guestPredictions));
         localStorage.setItem('ael_tournaments', JSON.stringify(tournaments));
         checkRewardUnlock();
     }
 
+    function renderAll() {
+        renderRatingTable();
+        renderTournaments();
+        renderWholeBracket();
+        renderAdminBlocksVisibility();
+    }
+
     function switchTab(tab) {
+        currentTab = tab;
         document.getElementById('tab-teams').classList.remove('active');
         document.getElementById('tab-tourneys').classList.remove('active');
         document.getElementById('tab-pickem').classList.remove('active');
@@ -299,168 +349,257 @@
         document.getElementById('page-tourneys').classList.add('hidden');
         document.getElementById('page-pickem').classList.add('hidden');
 
-        if (tab === 'teams') {
-            document.getElementById('tab-teams').classList.add('active');
-            document.getElementById('page-teams').classList.remove('hidden');
-        } else if (tab === 'tourneys') {
-            document.getElementById('tab-tourneys').classList.add('active');
-            document.getElementById('page-tourneys').classList.remove('hidden');
-            renderTournaments();
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.getElementById(`page-${tab}`).classList.remove('hidden');
+
+        renderAdminBlocksVisibility();
+    }
+
+    function toggleAdminMode() {
+        if(!isAdmin) {
+            let p = prompt("Введите пароль:");
+            if(p === "adminAEL") {
+                isAdmin = true;
+                document.getElementById('adminBtn').classList.add('active');
+                document.getElementById('adminBtn').innerText = "Выйти из Админки";
+            } else { alert("Неверно!"); }
         } else {
-            document.getElementById('tab-pickem').classList.add('active');
-            document.getElementById('page-pickem').classList.remove('hidden');
-            renderWholeBracket();
+            isAdmin = false;
+            document.getElementById('adminBtn').classList.remove('active');
+            document.getElementById('adminBtn').innerText = "Войти как Админ";
+        }
+        renderAll();
+    }
+
+    function renderAdminBlocksVisibility() {
+        // Прячем абсолютно все блоки управления
+        document.getElementById('admin-block-teams').classList.add('hidden');
+        document.getElementById('admin-block-tourneys').classList.add('hidden');
+        document.getElementById('admin-block-pickem').classList.add('hidden');
+
+        // Если админ авторизован, показываем блок строго под вкладку
+        if(isAdmin) {
+            if(currentTab === 'teams') {
+                document.getElementById('admin-block-teams').classList.remove('hidden');
+                renderAdminTeamsStatusDashboard();
+            } else if(currentTab === 'tourneys') {
+                document.getElementById('admin-block-tourneys').classList.remove('hidden');
+            } else if(currentTab === 'pickem') {
+                document.getElementById('admin-block-pickem').classList.remove('hidden');
+                document.getElementById('adminActiveStageSelect').value = pickemSystem.activeStage;
+                setupAdminMatchBuilder();
+            }
         }
     }
 
-    /* ================= ЛОГИКА РЕЙТИНГА И РАСКРЫТИЯ ИГРОКОВ ================= */
+    /* ================= ЛОГИКА ВКЛАДКИ КОМАНД С АВАТАРКАМИ И ФИЛЬТРОМ ВЫБЫВШИХ ================= */
+    function setTeamFilter(filter) {
+        currentFilter = filter;
+        document.getElementById('filter-all').classList.remove('active');
+        document.getElementById('filter-active').classList.remove('active');
+        document.getElementById('filter-out').classList.remove('active');
+        document.getElementById(`filter-${filter}`).classList.add('active');
+        renderRatingTable();
+    }
+
     function renderRatingTable() {
         const tbody = document.getElementById('teamsTableBody');
         tbody.innerHTML = '';
-        
-        defaultTeamsData.sort((a,b) => b.points - a.points).forEach((team, idx) => {
-            let rankClass = idx === 0 ? 'top-1' : (idx === 1 ? 'top-2' : (idx === 2 ? 'top-3' : ''));
-            let prefix = idx === 0 ? '👑 ' : `${idx + 1}`;
-            
-            // Строка команды
+
+        let sorted = [...teamsData].sort((a,b) => b.points - a.points);
+
+        sorted.forEach((team, originalIdx) => {
+            // Настоящий индекс в основном массиве
+            let actualIdx = teamsData.findIndex(t => t.name === team.name);
+
+            if(currentFilter === 'active' && team.isEliminated) return;
+            if(currentFilter === 'out' && !team.isEliminated) return;
+
+            let rankClass = originalIdx === 0 ? 'top-1' : '';
+            let prefix = originalIdx === 0 ? '🏆' : originalIdx + 1;
+
             const tr = document.createElement('tr');
-            tr.className = rankClass;
-            tr.onclick = () => togglePlayersList(idx);
+            tr.className = `team-row ${rankClass} ${team.isEliminated ? 'eliminated' : ''}`;
+            tr.onclick = () => togglePlayersList(actualIdx);
+            
+            // Если логотип похож на ссылку, рендерим img, иначе как эмодзи/текст
+            let logoHtml = team.logo.startsWith('http') ? `<img class="team-logo" src="${team.logo}">` : `<div class="team-logo">${team.logo || '👥'}</div>`;
+
             tr.innerHTML = `
                 <td>${prefix}</td>
-                <td><strong>${team.name}</strong></td>
-                <td class="col-points">${team.points}<span>очков</span></td>
+                <td>
+                    <div class="team-info-cell">
+                        ${logoHtml}
+                        <div>
+                            <strong>${team.name}</strong> 
+                            ${team.isEliminated ? '<span style="color:var(--inactive-red); font-size:11px; margin-left:5px;">(Выбыла)</span>' : ''}
+                        </div>
+                    </div>
+                </td>
+                <td class="col-points">${team.points}<span>PTS</span></td>
             `;
             tbody.appendChild(tr);
 
-            // Скрытая строка с игроками
-            const playersTr = document.createElement('tr');
-            playersTr.id = `players-row-${idx}`;
-            playersTr.className = 'players-row';
-            playersTr.style.display = 'none';
-            let listHtml = team.players.map(p => `<li>${p}</li>`).join('');
-            playersTr.innerHTML = `<td colspan="3"><div class="players-box"><ul class="players-list">${listHtml}</ul></div></td>`;
-            tbody.appendChild(playersTr);
+            const pTr = document.createElement('tr');
+            pTr.className = 'players-row';
+            let listHtml = (team.players || []).map(p => `<li>${p}</li>`).join('');
+            pTr.innerHTML = `
+                <td colspan="3">
+                    <div class="players-wrapper" id="wrapper-${actualIdx}">
+                        <div class="players-box">
+                            <ul class="players-list">${listHtml}</ul>
+                        </div>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(pTr);
         });
     }
 
     function togglePlayersList(idx) {
-        const row = document.getElementById(`players-row-${idx}`);
-        row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+        const w = document.getElementById(`wrapper-${idx}`);
+        if(w) w.classList.toggle('open');
     }
 
-    /* ================= ЛОГИКА ТУРНИРОВ ================= */
+    function addNewTeam() {
+        let name = document.getElementById('newTeamName').value.trim();
+        let logo = document.getElementById('newTeamLogo').value.trim() || "👥";
+        let points = parseInt(document.getElementById('newTeamPoints').value) || 0;
+        let playersArr = document.getElementById('newTeamPlayers').value.split(',').map(p => p.trim()).filter(Boolean);
+
+        if(!name) return alert("Укажите имя команды");
+        teamsData.push({ name, logo, points, isEliminated: false, players: playersArr });
+        
+        // Сразу обновляем доступные команды для пикема Stage 1
+        pickemSystem.allowedTeamsPerStage[1] = teamsData.map(t => t.name);
+
+        saveAndSync(); renderAll();
+        document.getElementById('newTeamName').value = '';
+        document.getElementById('newTeamPoints').value = '';
+        document.getElementById('newTeamPlayers').value = '';
+    }
+
+    function renderAdminTeamsStatusDashboard() {
+        const container = document.getElementById('adminTeamsStatusList');
+        container.innerHTML = '';
+        teamsData.forEach((team, idx) => {
+            const div = document.createElement('div');
+            div.style = "background:var(--bg-main); padding:10px; border:1px solid var(--border); border-radius:4px; display:flex; justify-content:space-between; align-items:center;";
+            div.innerHTML = `
+                <span style="font-size:13px; font-weight:bold;">${team.name}</span>
+                <button class="btn-status ${team.isEliminated ? 'eliminated-status':'active-status'}" onclick="toggleTeamElimination(${idx})">
+                    ${team.isEliminated ? 'Выбыла' : 'Играет'}
+                </button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function toggleTeamElimination(idx) {
+        teamsData[idx].isEliminated = !teamsData[idx].isEliminated;
+        saveAndSync(); renderAll();
+    }
+
+
+    /* ================= ЛОГИКА ВКЛАДКИ ТУРНИРОВ ================= */
     function renderTournaments() {
         const grid = document.getElementById('tournamentsGrid');
         grid.innerHTML = '';
         tournaments.forEach(t => {
             grid.innerHTML += `
                 <div class="tournament-card">
-                    <div class="tournament-img"></div>
-                    <span class="status-badge ${t.status === 'active' ? 'active' : 'inactive'}">${t.status === 'active' ? 'Активен' : 'Завершен'}</span>
-                    <div class="tournament-info"><div style="font-weight:bold;">${t.name}</div></div>
+                    <div class="tournament-img">${t.icon || '🎮'}</div>
+                    <span class="status-badge ${t.status === 'active' ? 'active':'inactive'}">${t.status === 'active'?'Активен':'Завершен'}</span>
+                    <div class="tournament-info"><strong>${t.name}</strong></div>
                 </div>
             `;
         });
     }
 
     function addTournamentByAdmin() {
-        const name = document.getElementById('tourneyName').value.trim();
-        if(!name) return alert("Введите имя турнира");
-        tournaments.push({ name, status: document.getElementById('tourneyStatus').value });
+        let name = document.getElementById('tourneyName').value.trim();
+        let icon = document.getElementById('tourneyIcon').value.trim() || "🎮";
+        let status = document.getElementById('tourneyStatus').value;
+        if(!name) return alert("Название турнира пустое");
+
+        tournaments.push({ name, icon, status });
+        saveAndSync(); renderTournaments();
         document.getElementById('tourneyName').value = '';
-        saveAndSync(); renderTournaments(); alert("Турнир успешно добавлен!");
     }
 
-    /* ================= УПРАВЛЕНИЕ АДМИНКОЙ (PICK'EM) ================= */
-    function toggleAdminMode() {
-        if (!isAdmin) {
-            let pass = prompt("Введите пароль администратора:");
-            if (pass === "adminAEL") {
-                isAdmin = true;
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('adminActiveStageSelect').value = pickemSystem.activeStage;
-                setupAdminMatchBuilder();
-                renderWholeBracket();
-            } else { alert("Неверный пароль!"); }
-        } else {
-            isAdmin = false;
-            document.getElementById('adminPanel').style.display = 'none';
-            renderWholeBracket();
-        }
-    }
 
+    /* ================= ЛОГИКА ВКЛАДКИ PICK'EM СЕТКИ ================= */
     function setupAdminMatchBuilder() {
         const stage = pickemSystem.activeStage;
-        const poolContainer = document.getElementById('adminDragPool');
-        const slotsGrid = document.getElementById('adminSlotsGrid');
-        poolContainer.innerHTML = ''; slotsGrid.innerHTML = '';
+        const pool = document.getElementById('adminDragPool');
+        const grid = document.getElementById('adminSlotsGrid');
+        pool.innerHTML = ''; grid.innerHTML = '';
 
-        if (stage > 4) { poolContainer.innerHTML = 'Турнир завершен'; return; }
+        if(stage > 3) { pool.innerHTML = 'Турнир завершен!'; return; }
 
         let currentMatches = pickemSystem.matches[stage] || [];
-        let placedTeams = [];
-        currentMatches.forEach(m => { if(m.t1) placedTeams.push(m.t1); if(m.t2) placedTeams.push(m.t2); });
+        let placed = [];
+        currentMatches.forEach(m => { if(m.t1) placed.push(m.t1); if(m.t2) placed.push(m.t2); });
 
-        let availableTeams = pickemSystem.allowedTeamsPerStage[stage].filter(t => !placedTeams.includes(t));
-        
-        availableTeams.forEach(team => {
-            const div = document.createElement('div');
-            div.className = 'drag-item'; div.draggable = true; div.innerText = team;
-            div.ondragstart = (e) => e.dataTransfer.setData("text", team);
-            poolContainer.appendChild(div);
+        let available = (pickemSystem.allowedTeamsPerStage[stage] || []).filter(t => !placed.includes(t));
+
+        available.forEach(team => {
+            const d = document.createElement('div');
+            d.className = 'drag-item'; d.draggable = true; d.innerText = team;
+            d.ondragstart = (e) => e.dataTransfer.setData("text", team);
+            pool.appendChild(d);
         });
 
-        let totalMatchesCount = stage === 1 ? 8 : (stage === 2 ? 4 : (stage === 3 ? 2 : 1));
-        for (let i = 0; i < totalMatchesCount; i++) {
-            let existingMatch = currentMatches[i] || { id: i, t1: "", t2: "", winner: "" };
-            const matchSlot = document.createElement('div');
-            matchSlot.className = 'admin-match-slot';
-            matchSlot.innerHTML = `
-                <div style="font-size:11px; color:var(--accent); margin-bottom:5px;">Пара #${i+1}</div>
-                <div class="drop-zone" ondragover="allowDrop(event)" ondrop="handleSlotDrop(event, ${i}, 't1')">${existingMatch.t1 ? `<b>${existingMatch.t1}</b>` : 'Команда 1'}</div>
-                <div class="drop-zone" ondragover="allowDrop(event)" ondrop="handleSlotDrop(event, ${i}, 't2')">${existingMatch.t2 ? `<b>${existingMatch.t2}</b>` : 'Команда 2'}</div>
-                ${existingMatch.t1 && existingMatch.t2 ? `
-                    <select id="winner-select-${i}" style="width:100%; margin-top:4px; background:#000; color:#fff;">
-                        <option value="">-- Выбрать победителя --</option>
-                        <option value="${existingMatch.t1}" ${existingMatch.winner === existingMatch.t1 ? 'selected':''}>${existingMatch.t1}</option>
-                        <option value="${existingMatch.t2}" ${existingMatch.winner === existingMatch.t2 ? 'selected':''}>${existingMatch.t2}</option>
+        let count = stage === 1 ? 4 : (stage === 2 ? 2 : 1);
+        for(let i=0; i<count; i++) {
+            let m = currentMatches[i] || { id: i, t1: "", t2: "", winner: "" };
+            const slot = document.createElement('div');
+            slot.style = "background:var(--bg-main); padding:10px; border:1px solid var(--border); border-radius:6px;";
+            slot.innerHTML = `
+                <div style="font-size:11px; color:var(--accent); margin-bottom:4px;">Матч #${i+1}</div>
+                <div class="drop-zone" ondragover="allowDrop(event)" ondrop="handleSlotDrop(event, ${i}, 't1')">${m.t1 ? `<b>${m.t1}</b>` : 'Перетащите команду 1'}</div>
+                <div class="drop-zone" ondragover="allowDrop(event)" ondrop="handleSlotDrop(event, ${i}, 't2')">${m.t2 ? `<b>${m.t2}</b>` : 'Перетащите команду 2'}</div>
+                ${m.t1 && m.t2 ? `
+                    <select id="winner-select-${i}" style="width:100%; margin-top:5px; background:#000; color:#fff; padding:3px;">
+                        <option value="">-- Победитель матча --</option>
+                        <option value="${m.t1}" ${m.winner===m.t1?'selected':''}>${m.t1}</option>
+                        <option value="${m.t2}" ${m.winner===m.t2?'selected':''}>${m.t2}</option>
                     </select>
                 `:''}
             `;
-            slotsGrid.appendChild(matchSlot);
+            grid.appendChild(slot);
         }
     }
 
     function allowDrop(e) { e.preventDefault(); }
-    function handleSlotDrop(e, matchIdx, slotType) {
+    function handleSlotDrop(e, idx, type) {
         e.preventDefault();
-        const teamName = e.dataTransfer.setData ? e.dataTransfer.getData("text") : e.dataTransfer.getData("text");
-        const stage = pickemSystem.activeStage;
-        if (!pickemSystem.matches[stage]) pickemSystem.matches[stage] = [];
-        if (!pickemSystem.matches[stage][matchIdx]) pickemSystem.matches[stage][matchIdx] = { id: matchIdx, t1: "", t2: "", winner: "" };
-        pickemSystem.matches[stage][matchIdx][slotType] = teamName;
+        let team = e.dataTransfer.getData("text");
+        let st = pickemSystem.activeStage;
+        if(!pickemSystem.matches[st]) pickemSystem.matches[st] = [];
+        if(!pickemSystem.matches[st][idx]) pickemSystem.matches[st][idx] = { id: idx, t1: "", t2: "", winner: "" };
+        pickemSystem.matches[st][idx][type] = team;
         setupAdminMatchBuilder();
     }
     function handlePoolDrop(e) {
         e.preventDefault();
-        const teamName = e.dataTransfer.getData("text");
+        let team = e.dataTransfer.getData("text");
         (pickemSystem.matches[pickemSystem.activeStage] || []).forEach(m => {
-            if (m.t1 === teamName) m.t1 = ""; if (m.t2 === teamName) m.t2 = "";
+            if(m.t1 === team) m.t1 = ""; if(m.t2 === team) m.t2 = "";
         });
         setupAdminMatchBuilder();
     }
 
     function saveAdminCreatedMatches() {
-        const stage = pickemSystem.activeStage;
-        let totalMatchesCount = stage === 1 ? 8 : (stage === 2 ? 4 : (stage === 3 ? 2 : 1));
-        for(let i=0; i<totalMatchesCount; i++) {
-            if (pickemSystem.matches[stage] && pickemSystem.matches[stage][i]) {
-                const sel = document.getElementById(`winner-select-${i}`);
-                if (sel) pickemSystem.matches[stage][i].winner = sel.value;
+        let st = pickemSystem.activeStage;
+        let count = st === 1 ? 4 : (st === 2 ? 2 : 1);
+        for(let i=0; i<count; i++) {
+            if(pickemSystem.matches[st] && pickemSystem.matches[st][i]) {
+                let el = document.getElementById(`winner-select-${i}`);
+                if(el) pickemSystem.matches[st][i].winner = el.value;
             }
         }
-        saveAndSync(); setupAdminMatchBuilder(); renderWholeBracket(); alert("Сохранено!");
+        saveAndSync(); setupAdminMatchBuilder(); renderWholeBracket(); alert("Пары зафиксированы.");
     }
 
     function changeActiveStageByAdmin() {
@@ -469,130 +608,127 @@
     }
 
     function commitStageResults() {
-        const stage = pickemSystem.activeStage;
-        let currentMatches = pickemSystem.matches[stage] || [];
+        let st = pickemSystem.activeStage;
+        let count = st === 1 ? 4 : (st === 2 ? 2 : 1);
         let winners = [];
-        let totalMatchesCount = stage === 1 ? 8 : (stage === 2 ? 4 : (stage === 3 ? 2 : 1));
 
-        for(let i=0; i<totalMatchesCount; i++) {
-            const sel = document.getElementById(`winner-select-${i}`);
-            if (sel && sel.value) currentMatches[i].winner = sel.value;
+        for(let i=0; i<count; i++) {
+            let el = document.getElementById(`winner-select-${i}`);
+            if(el && el.value) pickemSystem.matches[st][i].winner = el.value;
+            
+            if(!pickemSystem.matches[st] || !pickemSystem.matches[st][i] || !pickemSystem.matches[st][i].winner) {
+                return alert("Распределите всех победителей в текущем этапе!");
+            }
+            winners.push(pickemSystem.matches[st][i].winner);
         }
 
-        let allDetermined = true;
-        for (let i = 0; i < totalMatchesCount; i++) {
-            if (!currentMatches[i] || !currentMatches[i].winner) { allDetermined = false; break; }
-            winners.push(currentMatches[i].winner);
-        }
-
-        if (!allDetermined) return alert("Выберите победителей во всех матчах!");
-
-        let nextStage = stage + 1;
-        if (nextStage <= 4) {
-            pickemSystem.allowedTeamsPerStage[nextStage] = winners;
-            pickemSystem.activeStage = nextStage;
-            document.getElementById('adminActiveStageSelect').value = nextStage;
+        let next = st + 1;
+        if(next <= 3) {
+            pickemSystem.allowedTeamsPerStage[next] = winners;
+            pickemSystem.activeStage = next;
         } else {
-            pickemSystem.activeStage = 5;
-            document.getElementById('adminActiveStageSelect').value = 5;
+            pickemSystem.activeStage = 4; // Конец
         }
-        saveAndSync(); setupAdminMatchBuilder(); renderWholeBracket(); alert("Итоги зафиксированы!");
+        saveAndSync(); renderAll(); alert("Результаты этапа сохранены!");
     }
 
     function resetPickemSystem() {
-        if(confirm("Сбросить сетку?")) {
-            pickemSystem = { activeStage: 1, allowedTeamsPerStage: { 1: [...initial16Names], 2: [], 3: [], 4: [] }, matches: { 1: [], 2: [], 3: [], 4: [] } };
-            guestPredictions = { 1: {}, 2: {}, 3: {}, 4: {} };
-            saveAndSync(); setupAdminMatchBuilder(); renderWholeBracket();
+        if(confirm("Очистить сетку прогнозов?")) {
+            pickemSystem = { activeStage: 1, allowedTeamsPerStage: { 1: teamsData.map(t => t.name), 2: [], 3: [] }, matches: { 1: [], 2: [], 3: [] } };
+            guestPredictions = { 1: {}, 2: {}, 3: {} };
+            saveAndSync(); renderAll();
         }
     }
 
-    /* ================= ИНТЕРФЕЙС СЕТКИ ДЛЯ ГОСТЕЙ ================= */
     function renderWholeBracket() {
-        const statusTitle = document.getElementById('userStageStatusTitle');
-        if (pickemSystem.activeStage <= 4) {
-            statusTitle.innerHTML = `Текущий игровой этап: <span style="color:var(--accent);">Stage ${pickemSystem.activeStage}</span>`;
+        const title = document.getElementById('userStageStatusTitle');
+        if(pickemSystem.activeStage <= 3) {
+            title.innerHTML = `Текущая стадия турнира: <span style="color:var(--accent)">Stage ${pickemSystem.activeStage}</span>`;
             document.getElementById('saveUserPicksBtn').classList.remove('hidden');
         } else {
-            statusTitle.innerHTML = `<span style="color:var(--active-green);">🏆 Турнир завершен!</span>`;
+            title.innerHTML = `<span style="color:var(--active-green)">🏆 Турнир успешно завершен!</span>`;
             document.getElementById('saveUserPicksBtn').classList.add('hidden');
         }
 
-        for (let st = 1; st <= 4; st++) {
-            const columnContainer = document.getElementById(`bracket-stage-${st}`);
-            columnContainer.innerHTML = '';
-            let matches = pickemSystem.matches[st] || [];
-            
-            if (matches.length === 0) {
-                columnContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px; padding:15px; border:1px dashed var(--border);">Ожидание пар...</div>`;
+        for(let s = 1; s <= 3; s++) {
+            const container = document.getElementById(`bracket-stage-${s}`);
+            if(!container) continue;
+            container.innerHTML = '';
+
+            let list = pickemSystem.matches[s] || [];
+            if(list.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:15px; font-size:12px; color:var(--text-muted); border:1px dashed var(--border);">Ожидание генерации пар...</div>`;
                 continue;
             }
 
-            matches.forEach((m) => {
+            list.forEach(m => {
                 if(!m.t1 && !m.t2) return;
-                const mBox = document.createElement('div');
-                mBox.className = 'match-box';
-                mBox.innerHTML = `<div class="match-title">Матч #${m.id + 1}</div>`;
+                const box = document.createElement('div');
+                box.className = 'match-box';
+                box.innerHTML = `<div style="font-size:10px; color:var(--text-muted);">Матч #${m.id+1}</div>`;
 
                 [m.t1, m.t2].forEach(team => {
                     if(!team) return;
                     const btn = document.createElement('button');
-                    btn.className = `pick-team-btn ${getCardStyleClass(st, m, team)}`;
+                    btn.className = `pick-team-btn ${getPredictionStyles(s, m, team)}`;
                     btn.innerText = team;
-                    if (pickemSystem.activeStage === st) {
+                    
+                    if(pickemSystem.activeStage === s) {
                         btn.onclick = () => {
-                            if (!guestPredictions[st]) guestPredictions[st] = {};
-                            guestPredictions[st][m.id] = guestPredictions[st][m.id] === team ? null : team;
+                            if(!guestPredictions[s]) guestPredictions[s] = {};
+                            guestPredictions[s][m.id] = (guestPredictions[s][m.id] === team) ? null : team;
                             renderWholeBracket();
                         };
                     }
-                    mBox.appendChild(btn);
+                    box.appendChild(btn);
                 });
-                columnContainer.appendChild(mBox);
+                container.appendChild(box);
             });
         }
     }
 
-    function getCardStyleClass(stage, match, teamName) {
-        let classes = [];
-        if (guestPredictions[stage] && guestPredictions[stage][match.id] === teamName) classes.push('voted');
-        if (match.winner) {
-            if (match.winner === teamName) classes.push('result-winner');
-            else classes.push('result-loser');
+    function getPredictionStyles(s, m, team) {
+        let arr = [];
+        if(guestPredictions[s] && guestPredictions[s][m.id] === team) arr.push('voted');
+        if(m.winner) {
+            if(m.winner === team) arr.push('result-winner');
+            else arr.push('result-loser');
         }
-        return classes.join(' ');
+        return arr.join(' ');
     }
 
     function saveUserPredictions() {
-        const stage = pickemSystem.activeStage;
-        let totalMatchesCount = stage === 1 ? 8 : (stage === 2 ? 4 : (stage === 3 ? 2 : 1));
-        let userMadePicksCount = Object.values(guestPredictions[stage] || {}).filter(Boolean).length;
-
-        if (userMadePicksCount < totalMatchesCount) return alert(`Сделайте все ${totalMatchesCount} прогнозов!`);
-        saveAndSync(); alert("Прогноз принят!");
+        let st = pickemSystem.activeStage;
+        let count = st === 1 ? 4 : (st === 2 ? 2 : 1);
+        let selected = Object.values(guestPredictions[st] || {}).filter(Boolean).length;
+        if(selected < count) return alert("Сделайте свой выбор для всех доступных пар!");
+        saveAndSync(); alert("Прогноз сохранен!");
     }
 
     function checkRewardUnlock() {
-        let stage1Matches = pickemSystem.matches[1] || [];
-        if (stage1Matches.length < 8) return setPremiumStyle(false);
-        let totalCorrect = 0, checked = 0;
-        stage1Matches.forEach(m => {
-            if (m.winner) {
+        let stage1 = pickemSystem.matches[1] || [];
+        if(stage1.length < 4) return triggerPremiumStyles(false);
+        
+        let correct = 0, checked = 0;
+        stage1.forEach(m => {
+            if(m.winner) {
                 checked++;
-                if (guestPredictions[1] && guestPredictions[1][m.id] === m.winner) totalCorrect++;
+                if(guestPredictions[1] && guestPredictions[1][m.id] === m.winner) correct++;
             }
         });
-        setPremiumStyle(checked === 8 && totalCorrect === 8);
+
+        // Стиль активируется, если угаданы все 4 матча Stage 1
+        triggerPremiumStyles(checked === 4 && correct === 4);
     }
 
-    function setPremiumStyle(unlocked) {
-        const banner = document.getElementById('rewardBanner');
-        if (unlocked) {
+    function triggerPremiumStyles(status) {
+        const b = document.getElementById('rewardBanner');
+        if(status) {
             document.body.classList.add('perfect-pickem-unlocked');
-            if(banner) banner.classList.remove('hidden');
+            if(b) b.classList.remove('hidden');
         } else {
             document.body.classList.remove('perfect-pickem-unlocked');
-            if(banner) banner.classList.add('hidden');
+            if(b) b.classList.add('hidden');
         }
     }
 </script>
