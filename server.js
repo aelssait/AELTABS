@@ -21,5 +21,5 @@ app.post('/save-teams', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(Сервер работает на порту ${PORT});
+    console.log("Сервер работает на порту" , ${PORT});
 });
