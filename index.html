@@ -23,8 +23,8 @@
         body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 50px; }
 
         /* Шапка сайта */
-        header { background-color: var(--bg-header); border-bottom: 2px solid var(--accent); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 24px; font-weight: bold; tracking-letter: 1px; }
+        header { background-color: var(--bg-header); border-bottom: 2px solid var(--accent); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .logo { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
         .logo span { color: var(--accent); }
         
         nav button { background: none; border: none; color: var(--text-main); font-size: 16px; margin-left: 20px; cursor: pointer; padding: 5px 10px; transition: 0.2s; }
@@ -48,13 +48,28 @@
         /* Таблица Рейтинга */
         .ranking-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 6px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .ranking-table th { background: var(--bg-header); color: var(--text-muted); text-align: left; padding: 15px; font-size: 14px; text-transform: uppercase; }
-        .ranking-table td { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.1s; }
-        .ranking-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .ranking-table td { padding: 15px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .ranking-table tr.team-row { cursor: pointer; }
+        .ranking-table tr.team-row:hover td { background: rgba(255,255,255,0.02); }
         
         .col-place { width: 60px; font-weight: bold; text-align: center; color: var(--text-muted); }
-        tr:nth-child(1) .col-place { color: #gold; color: #f59e0b; font-size: 18px; } /* Топ 1 */
+        tr:nth-child(1) .col-place { color: #f59e0b; font-size: 18px; } /* Топ 1 */
+        
+        /* Стили для Аватарок команд */
+        .team-info-cell { display: flex; align-items: center; gap: 12px; }
+        .team-logo { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; background: #16191e; border: 1px solid var(--border); }
+        .team-logo-placeholder { width: 32px; height: 32px; border-radius: 4px; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-muted); font-size: 14px; text-transform: uppercase; }
+        
         .col-team { font-weight: bold; font-size: 16px; }
-        .col-points { text-align: right; font-weight: bold; color: var(--accent); width: 120px; }
+        .col-points { text-align: right; font-weight: bold; color: var(--accent); width: 100px; }
+        
+        /* Блок лайков */
+        .col-reactions { width: 160px; text-align: center; }
+        .reaction-buttons { display: flex; gap: 8px; justify-content: center; }
+        .btn-like, .btn-dislike { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
+        .btn-like:hover { border-color: var(--active-green); color: var(--active-green); }
+        .btn-dislike:hover { border-color: var(--inactive-red); color: var(--inactive-red); }
+
         .col-actions { width: 100px; text-align: center; }
 
         /* Состав команды (выпадающий) */
@@ -100,6 +115,7 @@
             <div class="form-group">
                 <input type="text" id="teamName" placeholder="Название команды">
                 <input type="number" id="teamPoints" placeholder="Баллы (очки)">
+                <input type="text" id="teamLogoUrl" placeholder="Ссылка на URL аватарки команды">
                 <input type="text" id="teamPlayers" placeholder="Игроки через запятую (например: s1mple, b1t, jL)">
                 <button class="btn" onclick="saveTeam()">Сохранить команду</button>
             </div>
@@ -128,6 +144,7 @@
                     <th class="col-place">#</th>
                     <th class="col-team">Команда</th>
                     <th class="col-points">Баллы</th>
+                    <th class="col-reactions">Мнение гостей</th>
                     <th class="col-actions admin-only hidden">Действия</th>
                 </tr>
             </thead>
@@ -147,29 +164,38 @@
 </div>
 
 <script>
-    // Изначальные (демо) данные, чтобы сайт не был пустым при первом запуске
-    let teams = [
-        { id: 1, name: "Natus Vincere", points: 1000, players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"] },
-        { id: 2, name: "FaZe Clan", points: 850, players: ["karrigan", "NiKo", "ropz", "broky", "rain"] },
-        { id: 3, name: "Team Spirit", points: 920, players: ["shalfey", "chopper", "magixx", "donk", "zoner"] }
+    // Загрузка данных из LocalStorage, либо дефолтные, если память пуста
+    let defaultTeams = [
+        { id: 1, name: "Natus Vincere", points: 1000, logo: "https://img-cdn.hltv.org/teamlogo/9v6S8p0p7OQ4zWJcW8u5_O.svg?ixlib=java-2.1.0&s=7c1b500fa2066fa9d0bc650ee0e94bb7", players: ["jL", "b1t", "Aleksib", "iIM", "w0nderful"], likes: 15, dislikes: 2 },
+        { id: 2, name: "FaZe Clan", points: 850, logo: "", players: ["karrigan", "NiKo", "ropz", "broky", "rain"], likes: 8, dislikes: 4 },
+        { id: 3, name: "Team Spirit", points: 920, logo: "", players: ["shalfey", "chopper", "magixx", "donk", "zoner"], likes: 23, dislikes: 1 }
     ];
 
-    let tournaments = [
+    let defaultTournaments = [
         { id: 1, name: "AEL Masters 2026", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500", status: "active" },
         { id: 2, name: "AEL Spring Cup", img: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=500", status: "inactive" }
     ];
+
+    let teams = JSON.parse(localStorage.getItem('ael_teams')) || defaultTeams;
+    let tournaments = JSON.parse(localStorage.getItem('ael_tournaments')) || defaultTournaments;
 
     let isAdmin = false;
     let editingTeamId = null;
 
     // Инициализация при загрузке
+    saveToStorage();
     renderTeams();
     renderTournaments();
+
+    function saveToStorage() {
+        localStorage.setItem('ael_teams', JSON.stringify(teams));
+        localStorage.setItem('ael_tournaments', JSON.stringify(tournaments));
+    }
 
     function toggleAdminMode() {
         if (!isAdmin) {
             let pass = prompt("Введите пароль администратора:");
-            if (pass === "adminAEL") { // Временный простой пароль
+            if (pass === "adminAEL") { 
                 isAdmin = true;
                 document.getElementById('adminPanel').style.display = 'block';
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
@@ -182,6 +208,7 @@
             isAdmin = false;
             document.getElementById('adminPanel').style.display = 'none';
             document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+            renderTeams();
         }
     }
 
@@ -206,19 +233,34 @@
 
     // Рендеринг таблицы команд (с автосортировкой по баллам)
     function renderTeams() {
-        // Сортировка: у кого больше баллов — тот выше
         teams.sort((a, b) => b.points - a.points);
         
         const tbody = document.getElementById('teamsTableBody');
         tbody.innerHTML = '';
 
         teams.forEach((team, index) => {
-            // Строка команды
+            // Проверка аватарки
+            let logoHtml = team.logo 
+                ? `<img class="team-logo" src="${team.logo}" alt="${team.name}">`
+                : `<div class="team-logo-placeholder">${team.name.charAt(0)}</div>`;
+
             const tr = document.createElement('tr');
+            tr.className = 'team-row';
             tr.innerHTML = `
                 <td class="col-place" onclick="togglePlayers(${team.id})">${index + 1}</td>
-                <td class="col-team" onclick="togglePlayers(${team.id})">${team.name}</td>
+                <td class="col-team" onclick="togglePlayers(${team.id})">
+                    <div class="team-info-cell">
+                        ${logoHtml}
+                        <span>${team.name}</span>
+                    </div>
+                </td>
                 <td class="col-points" onclick="togglePlayers(${team.id})">${team.points} <span style="font-size:11px;color:var(--text-muted)">pts</span></td>
+                <td class="col-reactions">
+                    <div class="reaction-buttons">
+                        <button class="btn-like" onclick="likeTeam(${team.id}, event)">👍 <span>${team.likes || 0}</span></button>
+                        <button class="btn-dislike" onclick="likeTeam(${team.id}, event, false)">👎 <span>${team.dislikes || 0}</span></button>
+                    </div>
+                </td>
                 <td class="col-actions admin-only ${isAdmin ? '' : 'hidden'}">
                     <button onclick="editTeam(${team.id})" style="background:none; border:none; color:var(--accent); cursor:pointer; margin-right:10px;">✏️</button>
                     <button onclick="deleteTeam(${team.id})" style="background:none; border:none; color:var(--inactive-red); cursor:pointer;">❌</button>
@@ -235,7 +277,7 @@
             if(team.players.length === 0) playersHtml = '<span style="color:var(--text-muted); font-size:13px;">Состав не указан</span>';
 
             playersTr.innerHTML = `
-                <td colspan="${isAdmin ? 4 : 3}">
+                <td colspan="${isAdmin ? 5 : 4}">
                     <div class="players-box">
                         <strong style="font-size:12px; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:8px;">Текущий ростер:</strong>
                         <ul class="players-list">${playersHtml}</ul>
@@ -251,32 +293,46 @@
         row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
     }
 
+    // Гостевые лайки / дизлайки
+    function likeTeam(id, event, isLike = true) {
+        event.stopPropagation(); // Чтобы не раскрывался список игроков при клике на лайк
+        const team = teams.find(t => t.id === id);
+        if (isLike) {
+            team.likes = (team.likes || 0) + 1;
+        } else {
+            team.dislikes = (team.dislikes || 0) + 1;
+        }
+        saveToStorage();
+        renderTeams();
+    }
+
     // Функции админки для Команд
     function saveTeam() {
         const name = document.getElementById('teamName').value.trim();
         const points = parseInt(document.getElementById('teamPoints').value) || 0;
+        const logo = document.getElementById('teamLogoUrl').value.trim();
         const playersString = document.getElementById('teamPlayers').value;
         const players = playersString ? playersString.split(',').map(p => p.trim()) : [];
 
         if (!name) return alert('Введите название команды!');
 
         if (editingTeamId) {
-            // Редактирование
             const team = teams.find(t => t.id === editingTeamId);
             team.name = name;
             team.points = points;
+            team.logo = logo;
             team.players = players;
             editingTeamId = null;
         } else {
-            // Создание новой
-            teams.push({ id: Date.now(), name, points, players });
+            teams.push({ id: Date.now(), name, points, logo, players, likes: 0, dislikes: 0 });
         }
 
-        // Очистка формы
         document.getElementById('teamName').value = '';
         document.getElementById('teamPoints').value = '';
+        document.getElementById('teamLogoUrl').value = '';
         document.getElementById('teamPlayers').value = '';
         
+        saveToStorage();
         renderTeams();
     }
 
@@ -284,6 +340,7 @@
         const team = teams.find(t => t.id === id);
         document.getElementById('teamName').value = team.name;
         document.getElementById('teamPoints').value = team.points;
+        document.getElementById('teamLogoUrl').value = team.logo || '';
         document.getElementById('teamPlayers').value = team.players.join(', ');
         editingTeamId = id;
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -292,6 +349,7 @@
     function deleteTeam(id) {
         if(confirm("Удалить эту команду?")) {
             teams = teams.filter(t => t.id !== id);
+            saveToStorage();
             renderTeams();
         }
     }
@@ -323,7 +381,6 @@
         });
     }
 
-    // Функции админки для Турниров
     function saveTournament() {
         const name = document.getElementById('tourneyName').value.trim();
         const img = document.getElementById('tourneyImg').value.trim();
@@ -336,18 +393,21 @@
         document.getElementById('tourneyName').value = '';
         document.getElementById('tourneyImg').value = '';
         
+        saveToStorage();
         renderTournaments();
     }
 
     function toggleTourneyStatus(id) {
         const tourney = tournaments.find(t => t.id === id);
         tourney.status = tourney.status === 'active' ? 'inactive' : 'active';
+        saveToStorage();
         renderTournaments();
     }
 
     function deleteTourney(id) {
         if(confirm("Удалить турнир?")) {
             tournaments = tournaments.filter(t => t.id !== id);
+            saveToStorage();
             renderTournaments();
         }
     }
