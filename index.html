@@ -1001,11 +1001,23 @@
             renderTournaments();
 
         }
-
+<div id="liveCommand" style="font-size:30px; color:red; font-weight:bold;"></div>
     }
 
-</script>
+<script>
+    // Вставь свою ссылку от JSONBlob ↓
+    const DB_URL = "https://jsonblob.com/api/jsonBlob/019ebdf1-0ce0-769d-9d93-70afbb55b2b1";
 
+    async function showCommand() {
+        try {
+            let r = await fetch(DB_URL);
+            let data = await r.json();
+            document.getElementById("liveCommand").innerText = data.command;
+        } catch(e) { console.log("Ждём обновлений..."); }
+    }
+    showCommand();
+    setInterval(showCommand, 3000); // проверка каждые 3 секунды
+</script>
 </body>
 
 </html>
