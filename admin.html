@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <input id="cmd" placeholder="Введи команду">
+    <button onclick="send()">Отправить на сайт</button>
+    <script>
+        const DB_URL = "https://jsonblob.com/api/jsonBlob/019ebdf1-0ce0-769d-9d93-70afbb55b2b1"; // тот же URL
+
+        async function send() {
+            await fetch(DB_URL, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ command: document.getElementById("cmd").value })
+            });
+            alert("Команда отправлена!");
+        }
+    </script>
+</body>
+</html>
